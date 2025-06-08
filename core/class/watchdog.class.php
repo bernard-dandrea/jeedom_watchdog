@@ -440,9 +440,10 @@ public function faireTestExpression($_string) {
 			
 
 	//$_boucleEnCours="8541";
-		$this->setConfiguration('calcul', scenarioExpression::setTags(jeedom::fromHumanReadable($_string)));
+		$fromHumanReadable = jeedom::fromHumanReadable($_string);
+		$this->setConfiguration('calcul', scenarioExpression::setTags($fromHumanReadable));
 		
-		$return = evaluate(scenarioExpression::setTags(jeedom::fromHumanReadable($_string), $scenario, true));
+		$return = evaluate(scenarioExpression::setTags($fromHumanReadable, $scenario, true));
 				if (is_bool($return)) {
 					if ($return) $return = 'True';
 					 else $return = 'False';
