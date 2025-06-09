@@ -1,7 +1,6 @@
 Ce plugin va vous permettre de surveiller vos équipements, exemples :
 
-*   **Vérifier que vos nuts sont toujours actifs  
-    **
+*   **Vérifier que vos nuts sont toujours actifs**  
 *   **Contrôler que vos capteurs (quelque soit leur technologie) sont bien actifs**
 *   **S’assurer que vos équipements réseau sont bien connectés au routeur**
 *   **…**
