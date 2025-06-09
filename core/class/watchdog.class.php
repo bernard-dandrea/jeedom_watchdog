@@ -614,12 +614,14 @@ public function faireTestExpression($_string) {
     }
 
 
-    /*
-     * Non obligatoire permet de demander de ne pas supprimer les commandes même si elles ne sont pas dans la nouvelle configuration de l'équipement envoyé en JS
-      public function dontRemoveCmd() {
-      return true;
-      }
-     */
+	public function dontRemoveCmd()  // BD
+	{
+		if ($this->getLogicalId() == 'resultatglobal') {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
     public function execute($_options = array()) {
  	//log::add('watchdog','debug','[cmd] execute de '.$this->getName());        
