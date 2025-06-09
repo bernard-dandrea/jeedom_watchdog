@@ -11,6 +11,7 @@
 *   Application du PR de TomsnCo concernant la gestion de l'arborescence
 *   Transfert de la documentation et du changelog du site de @sigalou vers github
 *   Modification de info.json pour refléter les changements de propriétaire et lkes liens de la documentation
+*   Blocage de la suppression du champ 'Resultat Global' qui se produisait lors de la sauvegarde
 
 **Version 2021-03-20 01:09:51**
 
