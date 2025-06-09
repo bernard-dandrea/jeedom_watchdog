@@ -122,6 +122,16 @@ class watchdog extends eqLogic {
 			$cmd->setIsVisible(1);
             //$cmd->setOrder("2");
 			//$cmd->setDisplay('title_disable', 0);
+			// BD code pour automatiser l'utilisation d'un Template spécifique
+			// à activer ultérieurement
+			/*
+			$cmd->setTemplate("dashboard", "custom::watchdog");
+			$cmd->setTemplate("mobile", "custom::watchdog");
+			$cmd->setDisplay("showNameOndashboard", "0");
+			$cmd->setDisplay("showNameOnmobile", "0");
+   			*/
+			// BD END
+			
 			$cmd->save(); 
 		}    else {
 			//log::add('watchdog', 'debug', '╠═══> OK resultatglobal');
@@ -614,12 +624,14 @@ public function faireTestExpression($_string) {
     }
 
 
-    /*
-     * Non obligatoire permet de demander de ne pas supprimer les commandes même si elles ne sont pas dans la nouvelle configuration de l'équipement envoyé en JS
-      public function dontRemoveCmd() {
-      return true;
-      }
-     */
+	public function dontRemoveCmd()  // BD : bloque la suppression du champ 'résultat global'
+	{
+		if ($this->getLogicalId() == 'resultatglobal') {
+			return true;
+		} else {
+			return false;
+		}
+	}
 
     public function execute($_options = array()) {
  	//log::add('watchdog','debug','[cmd] execute de '.$this->getName());        

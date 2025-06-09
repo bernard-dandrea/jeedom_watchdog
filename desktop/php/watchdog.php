@@ -62,7 +62,7 @@ foreach ($eqLogics as $eqLogic) {
 
 		<div class="input-group pull-right" style="display:inline-flex">
 			
-			<a href="http://jeedom.sigalou-domotique.fr/watchdog-documentation"  style="margin-right:5px" target="_blank" class="btn btn-success eqLogicAction "  title="{{Lien vers la Documentation du plugin}}"><i class="fa fa-book"></i> </a>
+			<a href="https://bernard-dandrea.github.io/jeedom_watchdog/fr_FR/"  style="margin-right:5px" target="_blank" class="btn btn-success eqLogicAction "  title="{{Lien vers la Documentation du plugin}}"><i class="fa fa-book"></i> </a>
 			<a class="btn btn-info eqLogicAction  bt_plugin_view_log"  style="margin-right:5px" title="{{Logs du Watchdog}}"><i class="fa fa-file"></i> </a>
 			<a class="btn btn-default eqLogicAction "  style="margin-right:5px" data-action="configure" title="{{Configuration avancée du Watchdog}}"><i class="fas fa-cogs"></i> </a>
 			<a class="btn btn-warning eqLogicAction " style="margin-right:5px" data-action="copy" title="{{Dupliquer cet équipement}}"><i class="fas fa-copy"></i> </a>
