@@ -122,6 +122,16 @@ class watchdog extends eqLogic {
 			$cmd->setIsVisible(1);
             //$cmd->setOrder("2");
 			//$cmd->setDisplay('title_disable', 0);
+			// BD code pour automatiser l'utilisation d'un Template spécifique
+			// à activer ultérieurement
+			/*
+			$cmd->setTemplate("dashboard", "custom::watchdog");
+			$cmd->setTemplate("mobile", "custom::watchdog");
+			$cmd->setDisplay("showNameOndashboard", "0");
+			$cmd->setDisplay("showNameOnmobile", "0");
+   			*/
+			// BD END
+			
 			$cmd->save(); 
 		}    else {
 			//log::add('watchdog', 'debug', '╠═══> OK resultatglobal');
@@ -614,7 +624,7 @@ public function faireTestExpression($_string) {
     }
 
 
-	public function dontRemoveCmd()  // BD
+	public function dontRemoveCmd()  // BD : bloque la suppression du champ 'résultat global'
 	{
 		if ($this->getLogicalId() == 'resultatglobal') {
 			return true;
