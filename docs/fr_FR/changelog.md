@@ -12,6 +12,7 @@
 *   Transfert de la documentation et du changelog du site de @sigalou vers github
 *   Modification de info.json pour refléter les changements de propriétaire et lkes liens de la documentation
 *   Blocage de la suppression du champ 'Resultat Global' qui se produisait lors de la sauvegarde
+*   Suppression du répertoire core/template afin que l'affichage de la tuile prenne la valeur de 'Resultat global' et non #cmd#
 
 **Version 2021-03-20 01:09:51**
 
