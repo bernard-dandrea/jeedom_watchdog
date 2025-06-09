@@ -9,6 +9,7 @@
 *   Reprise de la gestion du plugin par @bernard.dandrea (un grand merci à @sigalou pour le formidable travail effectué sur le plugin)
 *   Application du PR de TommyChausson concernant la suppression des php notices récurrents "only variables should be passed by reference"
 *   Application du PR de TomsnCo concernant la gestion de l'arborescence
+*   Transfert de la documentation et du changelog du site de @sigalou vers github et modification des liens correspondants
 
 **Version 2021-03-20 01:09:51**
 
