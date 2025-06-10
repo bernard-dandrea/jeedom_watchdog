@@ -4,7 +4,7 @@
 >
 >S'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
 
-**Version 2025-06-09**
+**Version 2025-06-10**
 
 *   Reprise de la gestion du plugin par @bernard.dandrea (un grand merci à @sigalou pour le formidable travail effectué sur le plugin)
 *   Application du PR de TommyChausson concernant la suppression des php notices récurrents "only variables should be passed by reference"
@@ -12,7 +12,8 @@
 *   Transfert de la documentation et du changelog du site de @sigalou vers github
 *   Modification de info.json pour refléter les changements de propriétaire et lkes liens de la documentation
 *   Blocage de la suppression du champ 'Resultat Global' qui se produisait lors de la sauvegarde
-*   Suppression du répertoire core/template afin que l'affichage de la tuile prenne la valeur de 'Resultat global' et non #cmd#
+*   Suppression du répertoire core/template qui ne sert à rien
+*   Rename de la procédure toHTML dans watchdog.class.php car elle provoque l'affichage de #cmd# dans au lieu de 'Resultat global'
 
 **Version 2021-03-20 01:09:51**
 
