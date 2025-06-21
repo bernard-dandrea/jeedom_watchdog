@@ -7,7 +7,7 @@
 **BETA**
 
 *   Ajout de la commande Refresh (crée lors de la sauvegarde de l'équipement)
-*   Suppression des commentaires inutiles et indentation du code dans watchdog.class.php
+*   Dans watchdog.class.php, suppression des commentaires inutiles, des code inutile et indentation du code 
 
 **Version 2025-06-10**
 
