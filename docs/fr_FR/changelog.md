@@ -4,6 +4,11 @@
 >
 >S'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
 
+**BETA**
+
+*   Ajout de la commande Refresh (crée lors de la sauvegarde de l'équipement)
+*   Suppression des commentaires inutiles et indentation du code dans watchdog.class.php
+
 **Version 2025-06-10**
 
 *   Reprise de la gestion du plugin par @bernard.dandrea (un grand merci à @sigalou pour le formidable travail effectué sur le plugin)
