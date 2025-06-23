@@ -207,8 +207,8 @@ function addAction(_action, type, id_action="") {
 		}
 	//console.log("--------- testaction>>>>>>>>>>"+JSON.stringify(_action));
     div += '</div>';
-    var actionOption_id = uniqId();
-	//console.log(uniqId());
+    var actionOption_id = jeedomUtils.uniqId();
+	//console.log(jeedomUtils.uniqId());
     div += '<div style="margin-top : 5px;margin-bottom : 5px; margin-left : -5px;" class="col-sm-5  actionOptions" id="'+actionOption_id+'">';
     div += '</div>';
     div += '</div>';
@@ -229,8 +229,9 @@ function addAction(_action, type, id_action="") {
  */
 function addCmdToTable(_cmd, type) {
 	
-	//On ignore resultatglobal
+	//On ignore resultatglobal et refresh
 	if ((init(_cmd.logicalId) == 'resultatglobal')) return;
+	if ((init(_cmd.logicalId) == 'refresh')) return;
   
  // console.log("coucou1");
 //  console.log(_eqLogic.configuration.typeControl);
@@ -612,7 +613,7 @@ $('#table_actions').append('<legend><i class="fa fa-cogs" style="font-size : 2em
             for(var i in data){
                 $('#'+data[i].id).append(data[i].html.html);
             }
-            taAutosize();
+            jeedomUtils.taAutosize();
         }
     });
 	
@@ -630,7 +631,7 @@ $('#table_actions').append('<legend><i class="fa fa-cogs" style="font-size : 2em
         el.value(result.human);
         jeedom.cmd.displayActionOption(el.value(), '', function (html) {
             el.closest('.' + type).find('.actionOptions').html(html);
-            taAutosize();
+            jeedomUtils.taAutosize();
         });
     });
 });
