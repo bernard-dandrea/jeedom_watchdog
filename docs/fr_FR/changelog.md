@@ -7,7 +7,8 @@
 **BETA**
 
 *   Ajout de la commande Refresh (crée lors de la sauvegarde de l'équipement)
-*   Dans watchdog.class.php, suppression des commentaires inutiles, des code inutile et indentation du code 
+*   Dans watchdog.class.php, suppression des commentaires inutiles, des code inutile et indentation du code
+*   dans watchdog.js, ajout jeedomUtils. pour fonctions dépréciées uniqId et taAutosize
 
 **Version 2025-06-10**
 
