@@ -401,14 +401,15 @@ class watchdogCmd extends cmd
     {
         // Refresh du watchdog
         $eqLogic = $this->getEqLogic();
+
         if (!is_object($eqLogic) || $eqLogic->getIsEnable() != 1) {
             throw new \Exception(__('Equipement desactivé impossible d\éxecuter la commande : ' . $this->getHumanName(), __FILE__));
         }
 
-        // Refresh de lu watchdog
         if ($this->getLogicalId() == 'refresh') {
-            log::add('whatchdog', 'info', __('execute ', __FILE__) . '  refresh');
-            $eqLogic->whatchdog_Update('refresh');
+            log::add('watchdog', 'info', '║ ┌──────────────────────[Refresh de ' . $eqLogic->getName() . ']────────────────────────────────────────────────────────────────────────────────────');
+            log::add('watchdog', 'info', "║ └──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────");
+            $eqLogic->whatchdog_Update();
             return true;
         }
     }
