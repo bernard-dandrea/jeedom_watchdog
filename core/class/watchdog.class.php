@@ -16,31 +16,18 @@
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
 
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-
 /* * ***************************Includes********************************* */
-
 require_once __DIR__  . '/../../../../core/php/core.inc.php';
-
-
 
 class watchdog extends eqLogic
 {
-    /*     * *************************Attributs****************************** */
-
-
-
-    /*     * *********************Méthodes d'instance************************* */
 
     public function preInsert()
     {
-
         $this->setIsEnable(1);
         $this->setIsVisible(1);
         $this->setConfiguration('autorefresh', '*/5 * * * *');
     }
-
-
 
     public function preSave()
     {
@@ -53,14 +40,23 @@ class watchdog extends eqLogic
         } else {
             $this->setConfiguration('dernierLancement', 'SAVE ' . date("d.m.Y") . " " . date("H:i:s"));
         }
+
+        $ResultatGlobalOK = config::byKey('ResultatGlobalOK', 'watchdog', '1');
+        $ResultatGlobalOK = $this->getConfiguration("ResultatGlobalOK", $ResultatGlobalOK);
+        if ($ResultatGlobalOK == '1') {
+            $invertBinary = '0';
+        } else {
+            $invertBinary = '1';
+        }
+        $this->setConfiguration("invertBinary", $invertBinary);
     }
 
     public function postSave()
     {
+        // crée la commande refresh
         unset($cmd);
         $cmd = $this->getCmd(null, 'refresh');
         if (!is_object($cmd)) {
-
             log::add('watchdog', 'debug', '╠═══> Ajout de la commande action refresh à ' . $this->getName());
             $cmd = new watchdogCmd();
             $cmd->setName('Refresh');
@@ -73,6 +69,7 @@ class watchdog extends eqLogic
             $cmd->save();
         }
 
+        // crée la commande "Résultat Global"
         unset($cmd);
         $cmd = $this->getCmd(null, "resultatglobal");
         if (!is_object($cmd)) {
@@ -84,12 +81,18 @@ class watchdog extends eqLogic
             $cmd->setEqLogic_id($this->getId());
             $cmd->setName("Résultat Global");
             $cmd->setIsVisible(1);
+            $cmd->save();
+        }
 
+        $invertBinary = $this->getConfiguration("invertBinary");
+        $invertBinaryCurrent = $cmd->getDisplay("invertBinary", '0');
+        if ($invertBinary <> $invertBinaryCurrent) {
+            $cmd->setDisplay("invertBinary", $invertBinary);
+            log::add('watchdog', 'info', '╠═══> Modification de l\'affichage Inversé de Resultat Global à ' . $invertBinary);
             $cmd->save();
         }
         log::add('watchdog', 'info', "└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────");
     }
-
 
     public function lancerControle($watchdog)
     {
@@ -118,9 +121,7 @@ class watchdog extends eqLogic
 
         log::add('watchdog', 'debug', '╠════> On lance les contrôles :');
 
-
         foreach ($watchdog->getCmd('info') as $cmd) {
-
             // On sauvegarde le dernier résultat dans AvantdernierResultat
             $cmd->setConfiguration('resultatAvant', $cmd->getConfiguration('resultat'));
             if ($cmd->getLogicalId() != "resultatglobal") { // on ignore resultatglobal
@@ -219,11 +220,11 @@ class watchdog extends eqLogic
         }
     }
 
+    // Lancement des watchdogs éligibles (selon les paramètres du CRON)
     public static function update()
     {
         foreach (self::byType('watchdog') as $watchdog) {
             $autorefresh = $watchdog->getConfiguration('autorefresh');
-
             if ($watchdog->getIsEnable() == 1 && $autorefresh != '') {
                 try {
                     $c = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
@@ -237,11 +238,11 @@ class watchdog extends eqLogic
         }
     }
 
+    // Exécution des controles et actions d'un watchdog
     public function whatchdog_Update()
     {
         $watchdog = $this;
         try {
-
             $watchdog->setConfiguration('avantDernierLancement', $watchdog->getConfiguration('dernierLancement'));
             $watchdog->setConfiguration('dernierLancement', 'PRECRON ' . date("d.m.Y") . " " . date("H:i:s")); // PRECON c'est pour signaler que le CRON va etre sauvegarder
 
@@ -257,10 +258,6 @@ class watchdog extends eqLogic
 
 class watchdogCmd extends cmd
 {
-    /*     * *************************Attributs****************************** */
-
-
-    /*     * ***********************Methode static*************************** */
 
     public function faireTestExpression($_string)
     {
@@ -291,7 +288,6 @@ class watchdogCmd extends cmd
         return $return;
     }
 
-
     public function triggerEquip($passe)
     {
         $eqLogic = $this->getEqLogic();
@@ -304,7 +300,6 @@ class watchdogCmd extends cmd
 
             if ($eqLogic->getConfiguration('logspecifique'))
                 log::add('watchdog_' . $ideqLogic, 'info', '╔══════════════════════[' . $this->getName() . ' est passé à ' . $passe . ']════════════════════════════════════════════════════════════════════════════');
-
 
             foreach ($eqLogic->getConfiguration("watchdogAction") as $action) {
                 try {
@@ -319,7 +314,6 @@ class watchdogCmd extends cmd
                             $options[$key] = str_replace("#title#", $eqLogic->getName(), $option);
                         }
 
-
                         if ($options['log'] == '1') {
                             log::add('watchdog_' . $ideqLogic, 'info', '╠═══> Exécution de la commande ' . jeedom::toHumanReadable($action['cmd']) . " avec comme option(s) : " . json_encode($options));
                         }
@@ -333,17 +327,15 @@ class watchdogCmd extends cmd
                     log::add('watchdog', 'error', __('function trigger : Erreur lors de l\'éxecution de ', __FILE__) . $action['cmd'] . __('. Détails : ', __FILE__) . $e->getMessage());
                 }
             }
-            if ($eqLogic->getConfiguration('logspecifique')) log::add('watchdog_' . $ideqLogic, 'info', '╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+            if ($eqLogic->getConfiguration('logspecifique'))
+                log::add('watchdog_' . $ideqLogic, 'info', '╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
         }
     }
 
-
     /*     * *********************Methode d'instance************************* */
-
 
     public function preSave()
     {
-
         if ($this->getType() == 'action') return; //On ne fait pas le test si c'est une Commande Action		
         if ($this->getLogicalId() == 'resultatglobal') return; //On ne fait pas le test si c'est la commande 	resultatglobal	
         log::add('watchdog', 'info', '║ ┌──────────────────────[Sauvegarde du Contrôle ' . $this->getName() . ']────────────────────────────────────────────────────────────────────────────────────');
@@ -366,7 +358,6 @@ class watchdogCmd extends cmd
         if ($resultatPrecedent != $resultat) {
             $this->setConfiguration('resultat', $resultat);
 
-
             // Si le résultat a changé, il faut actualiser le calcul du résultat global, pour cela, on utilise la variable cmd.configuration.aChange qui traitera le calcul dans postSave
             $this->setConfiguration('aChange', true);
             //On ne va lancer le trigger que si on est en mode CRON et pas si on est en mode SAVE
@@ -388,9 +379,9 @@ class watchdogCmd extends cmd
     }
 
 
-    public function dontRemoveCmd()   
+    public function dontRemoveCmd()
     {
-        if ($this->getLogicalId() == 'resultatglobal') {
+        if ($this->getLogicalId() == 'resultatglobal' or $this->getLogicalId() == 'refresh') {
             return true;
         } else {
             return false;
