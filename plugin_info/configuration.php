@@ -22,3 +22,13 @@ if (!isConnect()) {
     die();
 }
 ?>
+
+<div class=" form-group">
+    <label class="col-sm-3 control-label">{{Contrôle OK lorsque le Résultat Global est égal à }}</label>
+    <div class="col-sm-3">
+        <select style="width: 150px;" id="sel_ResultatGlobalOK" class="configKey form-control" data-l1key="ResultatGlobalOK">
+            <option value="">{{True}}</option>
+            <option value="0">{{False}}</option>
+        </select>
+    </div>
+</div>
