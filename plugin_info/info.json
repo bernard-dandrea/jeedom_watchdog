@@ -4,7 +4,7 @@
 	"description" : "Plugin watchdog",
 	"licence" : "AGPL",
 	"author" : "bernard.dandrea",
-	"require" : "3.0",
+	"require" : "4.2",
 	"category" : "monitoring",
 	"hasDependency" : false,
 	"hasOwnDeamon" : false,
