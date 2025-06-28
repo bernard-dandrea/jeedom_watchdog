@@ -49,48 +49,154 @@ class watchdog extends eqLogic
             $invertBinary = '1';
         }
         $this->setConfiguration("invertBinary", $invertBinary);
+
+        $VirtualReport = config::byKey('VirtualReport', 'watchdog', '');
+        $VirtualReport = $this->getConfiguration("VirtualReport", $VirtualReport);
+        $this->setConfiguration("VirtualReportCourant", $VirtualReport);
+
+        $ReportOnlyNonOK = config::byKey('VirtualReport', 'ReportOnlyNonOK', '1');
+        $ReportOnlyNonOK = $this->getConfiguration("ReportOnlyNonOK", $ReportOnlyNonOK);
+        $this->setConfiguration("ReportOnlyNonOKCourant", $ReportOnlyNonOK);
     }
 
     public function postSave()
     {
-        // crée la commande refresh
-        unset($cmd);
-        $cmd = $this->getCmd(null, 'refresh');
-        if (!is_object($cmd)) {
+        // -----------------------------------------------------
+        // Commande refresh
+        // -----------------------------------------------------
+
+        unset($cmdRefresh);
+        $cmdRefresh = $this->getCmd(null, 'refresh');
+        if (!is_object($cmdRefresh)) {
             log::add('watchdog', 'debug', '╠═══> Ajout de la commande action refresh à ' . $this->getName());
-            $cmd = new watchdogCmd();
-            $cmd->setName('Refresh');
-            $cmd->setEqLogic_id($this->getId());
-            $cmd->setType('action');
-            $cmd->setSubType('other');
-            $cmd->setLogicalId('refresh');
-            $cmd->setIsVisible(1);
-            $cmd->setDisplay('generic_type', 'GENERIC_INFO');
-            $cmd->save();
+            $cmdRefresh = new watchdogCmd();
+            $cmdRefresh->setName('Refresh');
+            $cmdRefresh->setEqLogic_id($this->getId());
+            $cmdRefresh->setType('action');
+            $cmdRefresh->setSubType('other');
+            $cmdRefresh->setLogicalId('refresh');
+            $cmdRefresh->setIsVisible(1);
+            $cmdRefresh->setDisplay('generic_type', 'GENERIC_INFO');
+            $cmdRefresh->save();
         }
 
-        // crée la commande "Résultat Global"
-        unset($cmd);
-        $cmd = $this->getCmd(null, "resultatglobal");
-        if (!is_object($cmd)) {
+        // -----------------------------------------------------
+        // Commande Resultat Global
+        // -----------------------------------------------------
+        unset($cmdResultatGlobal);
+        $cmdResultatGlobal = $this->getCmd(null, "resultatglobal");
+        if (!is_object($cmdResultatGlobal)) {
             log::add('watchdog', 'debug', '╠═══> Ajout de la commande info resultatglobal à ' . $this->getName());
-            $cmd = new watchdogCmd();
-            $cmd->setType('info');
-            $cmd->setLogicalId("resultatglobal");
-            $cmd->setSubType('binary');
-            $cmd->setEqLogic_id($this->getId());
-            $cmd->setName("Résultat Global");
-            $cmd->setIsVisible(1);
-            $cmd->save();
+            $cmdResultatGlobal = new watchdogCmd();
+            $cmdResultatGlobal->setType('info');
+            $cmdResultatGlobal->setLogicalId("resultatglobal");
+            $cmdResultatGlobal->setSubType('binary');
+            $cmdResultatGlobal->setEqLogic_id($this->getId());
+            $cmdResultatGlobal->setName("Résultat Global");
+            $cmdResultatGlobal->setIsVisible(1);
+            $cmdResultatGlobal->save();
         }
 
-        $invertBinary = $this->getConfiguration("invertBinary");
-        $invertBinaryCurrent = $cmd->getDisplay("invertBinary", '0');
-        if ($invertBinary <> $invertBinaryCurrent) {
-            $cmd->setDisplay("invertBinary", $invertBinary);
-            log::add('watchdog', 'info', '╠═══> Modification de l\'affichage Inversé de Resultat Global à ' . $invertBinary);
-            $cmd->save();
+        // n'affiche pas le Resultat Global si pas de condition ET / OU
+        $typeControl = $this->getConfiguration('typeControl');
+        if ($typeControl <> 'ET' && $typeControl <> 'OU') {
+            if ($cmdResultatGlobal->getIsVisible() <> '1') {
+                $cmdResultatGlobal->setIsVisible(0);
+                $cmdResultatGlobal->save();
+            }
         }
+
+        // Applique l'affichage inversé si nécessaire
+        $invertBinary = $this->getConfiguration("invertBinary");
+        $invertBinaryCurrent = $cmdResultatGlobal->getDisplay("invertBinary", '0');
+        if ($invertBinary <> $invertBinaryCurrent) {
+            $cmdResultatGlobal->setDisplay("invertBinary", $invertBinary);
+            log::add('watchdog', 'info', '╠═══> Modification de l\'affichage Inversé de Resultat Global à ' . $invertBinary);
+            $cmdResultatGlobal->save();
+        }
+
+        // -----------------------------------------------------
+        // Reporting des watchdogs
+        // -----------------------------------------------------
+        $VirtualReportName = $this->getConfiguration("VirtualReportCourant");
+        $ReportOnlyNonOK = $this->getConfiguration("ReportOnlyNonOKCourant");
+
+        $whatchdog_ok = 1; // indique quel est la valeur de ResultatGlobal pour laquelle le whatchdog est OK
+        if ($this->getConfiguration("invertBinary", '0') == '1')
+            $whatchdog_ok = '0';
+
+        unset($eqVirtualReport);
+        $eqVirtualReport = eqLogic::byString($VirtualReportName);
+        if (!is_object($eqVirtualReport)) {
+            log::add('watchdog', 'error', '╠═══> Virtuel nécessaire pour le reporting non défini ' . $VirtualReportName);
+        } else {
+            $VirtualReportName = $eqVirtualReport->getHumanName();
+            $eqVirtualReportId = $eqVirtualReport->getId();
+
+            // récupère la commande correspondant à l'Id du watchdog
+            $eqLogicId = $this->getId();
+
+            unset($cmdReportWatchdog);
+            $cmdReportWatchdog = cmd::byEqLogicIdAndLogicalId($eqVirtualReportId, $eqLogicId);
+            if (!is_object($cmdReportWatchdog)) {
+                // crée la commande correspondant au watchdog dans le virtuel du reporting
+                log::add('watchdog', 'error', '╠═══> Création dans le virtuel de reporting ' . $VirtualReportName . ' de la commande correspondant au watchdog ' . $this->getName());
+                $cmdReportWatchdog = new virtualCmd();
+                $cmdReportWatchdog->setName($this->getName());
+                $cmdReportWatchdog->setEqLogic_id($eqVirtualReportId);
+                $cmdReportWatchdog->setLogicalId($eqLogicId);
+                $cmdReportWatchdog->setIsHistorized(1);
+                $cmdReportWatchdog->setConfiguration('historizeMode', 'none');
+                $cmdReportWatchdog->setConfiguration('historyPurge', '-7 day');
+                $cmdReportWatchdog->setConfiguration('repeatEventManagement', 'never');
+                $cmdReportWatchdog->setType('info');
+                $cmdReportWatchdog->setUnite('');
+                $cmdReportWatchdog->setSubType('binary');
+                $cmdReportWatchdog->setDisplay('generic_type', 'GENERIC_INFO');
+                $cmdReportWatchdog->setDisplay('graphType', 'column');
+                $cmdReportWatchdog->save();
+            }
+
+            $update_cmdReportWatchdog = false; // pour savoir si il faut faire une MAJ
+
+            // récupère le résultat de la commande Resultat global et MAJ la valeur dans le reporting
+            $WatchdogResultat = $cmdResultatGlobal->execCmd();
+            if ($WatchdogResultat <> $cmdReportWatchdog->execCmd()) {
+                $cmdReportWatchdog->event($cmdReportWatchdog->execCmd());
+                $update_cmdReportWatchdog = true;
+            }
+
+            // n'affiche pas le watchdog si pas de condition ET / OU
+            if ($typeControl <> 'ET' && $typeControl <> 'OU') {
+                if ($cmdReportWatchdog->getIsVisible() <> '1') {
+                    $cmdReportWatchdog->setIsVisible(0);
+                    $update_cmdReportWatchdog = true;
+                }
+            } else {
+                // affiche le controle quelque soit le résultat
+                if ($this->getConfiguration("ReportOnlyNonOKCourant") <> '1' && $cmdReportWatchdog->getIsVisible() == '0') {
+                    $cmdReportWatchdog->setIsVisible(1);
+                    $update_cmdReportWatchdog = true;
+                } else {
+                    // récupère le résultat de la commande Resultat global
+                    $WatchdogResultat = $cmdResultatGlobal->execCmd();
+                    // Affiche ou non la commande associée au watchdog en fonction de l'état du watchdog
+                    if ($WatchdogResultat == $whatchdog_ok && $cmdReportWatchdog->getIsVisible() == 1) {
+                        $cmdReportWatchdog->setIsVisible(0);
+                        $update_cmdReportWatchdog = true;
+                    }
+                    if ($WatchdogResultat != $whatchdog_ok && $cmdReportWatchdog->getIsVisible() == 0) {
+                        $cmdReportWatchdog->setIsVisible(1);
+                        $update_cmdReportWatchdog = true;
+                    }
+                }
+            }
+
+            if ($update_cmdReportWatchdog == true) {
+                $cmdReportWatchdog->save();
+            }
+        }
+
         log::add('watchdog', 'info', "└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────");
     }
 
