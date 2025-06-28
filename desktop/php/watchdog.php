@@ -152,16 +152,6 @@ $eqLogics = eqLogic::byType($plugin->getId());
 
 						<br>
 						<legend><i class="fa fa-list-alt" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Mode de fonctionnement}}</span></legend>
-						<div class=" form-group">
-							<label class="col-sm-3 control-label">{{Le contrôle est OK lors le Résultat Global est égal à }}</label>
-							<div class="col-sm-3">
-								<select style="width: 500px;" id="sel_object" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="ResultatGlobalOK">
-									<option value="">{{Valeur par défaut}}</option>
-									<option value="1">{{True}}</option>
-									<option value="0">{{False}}</option>
-								</select>
-							</div>
-						</div>
 
 						<div class="form-group">
 							<label class="col-sm-3 control-label">{{Mode de fonctionnement des contrôles}}</label>
@@ -196,6 +186,38 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							Il existe deux modes de fonctionnement : <br>
 							* Lancer une action uniquement si le contrôle change de valeur : Ce mode vous prévient quand le contrôle effectué a changé d'état<br>
 							* Lancer une action à chaque controle en fonction du résultat : Ce mode execute à chaque contrôle l'action qui correspond au résultat du contrôle.<br>
+						</div>
+
+						<legend><i class="fa fa-list-alt" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Résultat Global}}</span></legend>
+						<div class=" form-group">
+							<label class="col-sm-3 control-label">{{Le contrôle est OK lors le Résultat Global est égal à}}</label>
+							<div class="col-sm-3">
+								<select style="width: 500px;" id="sel_object" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="ResultatGlobalOK">
+									<option value="">{{Valeur par défaut}}</option>
+									<option value="1">{{True}}</option>
+									<option value="0">{{False}}</option>
+								</select>
+							</div>
+							<br><br>
+							<label class="col-sm-3 control-label">{{Virtuel pour le reporting}}</label>
+							<div class="col-sm-3">
+								<div class="input-group">
+									<input class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="VirtualReport" />
+									<span class="input-group-btn">
+										<a class="btn btn-default cursor" title="Rechercher un équipement" id="VirtualReport"><i class="fas fa-list-alt"></i></a>
+									</span>
+								</div>
+							</div>
+							<br><br>
+							<label class="col-sm-3 control-label">{{Afficher seulement les watchdogs non OK}}</label>
+							<div class="col-sm-3">
+								<select style="width: 500px;" id="sel_object" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="ReportOnlyNonOK">
+									<option value="">{{Valeur par défaut}}</option>
+									<option value="1">{{Oui}}</option>
+									<option value="0">{{Non}}</option>
+								</select>
+							</div>
+							<br><br>
 						</div>
 					</fieldset>
 				</form>
