@@ -10,6 +10,7 @@
 *   dans watchdog.js, ajout jeedomUtils. pour fonctions dépréciées uniqId et taAutosize
 *   Ajout de la commande Refresh (créée lors de la sauvegarde de l'équipement). On peut lancer un Refresh en cliquant sur l'icone en haut à droite de la tuile.
 *   Ajout dans la configuration du plugin et au niveau de chaque équipement d'un paramètre indiquant si le contrôle est OK lorsque le résultat global est à true ou à false. Cela permet d'indiquer la crosse verte si le résultat des contrôles est False
+*   Reporting des watchdogs dans un virtuel
 
 **Version 2025-06-10**
 
