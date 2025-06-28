@@ -24,6 +24,20 @@ $(document).ready(function () { //lancé quand toute la page est chargée
 
 // BOUTONS -------------
 
+// Selection du virtuel utilise pour le reporting pour l'equipement
+$('#VirtualReport').on('click', function () {
+	jeedom.eqLogic.getSelectModal({ eqLogic: { eqType_name: 'virtual' } }, function (result) {
+		$('.eqLogicAttr[data-l1key=configuration][data-l2key=VirtualReport]').value(result.human);
+	});
+});
+
+// Selection du virtuel utilise pour le reporting pour le plugin
+$('#VirtualReportGlobal').on('click', function () {
+	jeedom.eqLogic.getSelectModal({ eqLogic: { eqType_name: 'virtual' } }, function (result) {
+		$('.configKey[data-l1key=VirtualReport]').value(result.human);
+	});
+});
+
 $("body").delegate('.bt_removeAction', 'click', function () {
 	var type = $(this).attr('data-type');
 	$(this).closest('.' + type).remove();
