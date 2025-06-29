@@ -23,34 +23,40 @@ if (!isConnect()) {
 }
 ?>
 
-<div class=" form-group">
-    <label class="col-sm-3 control-label">{{Contrôle OK lorsque le Résultat Global est égal à }}</label>
-    <div class="col-sm-3">
-        <select style="width: 150px;" id="sel_ResultatGlobalOK" class="configKey form-control" data-l1key="ResultatGlobalOK">
-            <option value="">{{True}}</option>
-            <option value="0">{{False}}</option>
-        </select>
-    </div>
-    <br><br>
-    <label class="col-sm-3 control-label">{{Virtuel pour le reporting}}</label>
-    <div class="col-sm-3">
-        <div class="input-group">
-            <input class="configKey form-control" data-l1key="VirtualReport" />
-            <span class="input-group-btn">
-                <a class="btn btn-default cursor" title="Rechercher un équipement" id="VirtualReportGlobal"><i class="fas fa-list-alt"></i></a>
-            </span>
+<form class="form-horizontal">
+
+    <div class=" form-group">
+        <label class="col-sm-3 control-label">{{Contrôle OK lorsque le Résultat Global est égal à }}</label>
+        <div class="col-sm-3">
+            <select style="width: 150px;" id="sel_ResultatGlobalOK" class="configKey form-control" data-l1key="ResultatGlobalOK">
+                <option value="">{{True}}</option>
+                <option value="0">{{False}}</option>
+            </select>
+        </div>
+    </div> <br>
+    <div class=" form-group">
+        <label class="col-sm-3 control-label">{{Virtuel pour le reporting}}</label>
+        <div class="col-sm-3">
+            <div class="input-group">
+                <input class="configKey form-control" data-l1key="VirtualReport" />
+                <span class="input-group-btn">
+                    <a class="btn btn-default cursor" title="Rechercher un équipement" id="VirtualReportGlobal"><i class="fas fa-list-alt"></i></a>
+                </span>
+            </div>
+        </div>
+    </div> <br>
+    <div class=" form-group">
+        <label class="col-sm-3 control-label">{{Afficher seulement les watchdogs non OK}}</label>
+        <div class="col-sm-3">
+            <select style="width: 150px;" id="sel_ReportOnlyNonOK" class="configKey form-control" data-l1key="ReportOnlyNonOK">
+                <option value="">{{Oui}}</option>
+                <option value="0">{{Non}}</option>
+            </select>
         </div>
     </div>
-    <br><br>
-    <label class="col-sm-3 control-label">{{Afficher seulement les watchdogs non OK}}</label>
-    <div class="col-sm-3">
-        <select style="width: 150px;" id="sel_ReportOnlyNonOK" class="configKey form-control" data-l1key="ReportOnlyNonOK">
-            <option value="">{{Oui}}</option>
-            <option value="0">{{Non}}</option>
-        </select>
-    </div>
-    <br><br>
-</div>
+    <br>
+
+</form>
 
 
 <?php include_file('desktop', 'watchdog', 'js', 'watchdog'); ?>
