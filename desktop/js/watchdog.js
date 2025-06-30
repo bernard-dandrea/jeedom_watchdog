@@ -304,7 +304,7 @@ function printEqLogic(_eqLogic) {
 
 		var resultat = _eqLogic.configuration.dernierEtat;
 		// inverse l icone si l'affichage du Resultat Global est inversé
-		if (_eqLogic.configuration.invertBinary == '1') {
+		if (_eqLogic.configuration.ResultatGlobalOKCourant == '0') {
 			if (resultat == 'True') {
 				resultat = 'False'
 			}
@@ -338,7 +338,7 @@ function printEqLogic(_eqLogic) {
 		tr += '<td align=right style="background-color:#e0e2e2;">';
 
 		if (_eqLogic.configuration.dernierLancement.substring(0, 4) == "SAVE")
-			tr += "<i><small><small>Attention, résultat temporaire, peut être faux, sera actualisé au prochain CRON ---></small></small></i>";
+			tr += "<i><small>Attention, résultat temporaire, peut être faux, sera actualisé au prochain CRON/Refresh ---></small></i>";
 
 
 		tr += '</td>';
