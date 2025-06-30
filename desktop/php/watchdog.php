@@ -220,6 +220,67 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							</select>
 						</div> <br>
 
+						<?php
+						$widgetDashboard = cmd::getSelectOptionsByTypeAndSubtype('info', 'binary', 'dashboard', cmd::availableWidget('dashboard'));
+						$widgetMobile = cmd::getSelectOptionsByTypeAndSubtype('info', 'binary', 'dashboard', cmd::availableWidget('mobile'));
+						?>
+						<br><br>
+						<div class=" form-group">
+							<label class="col-sm-3 control-label">{{Widget Resultat Global dashboard}}</label>
+							<div class="col-sm-3">
+								<select style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_resultatglobal_dashboard">
+									<option value="">{{Valeur par défaut}}</option>
+									<?php
+									echo $widgetDashboard;
+									?>
+								</select>
+							</div>
+						</div>
+						<br>
+
+						<div class=" form-group">
+							<label class="col-sm-3 control-label">{{Widget Resultat Global mobile}}</label>
+							<div class="col-sm-3">
+								<select style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_resultatglobal_mobile">
+									<option value="">{{Valeur par défaut}}</option>
+									<?php
+									echo $widgetMobile;
+									?>
+								</select>
+							</div>
+						</div>
+						<br>
+
+						<div class=" form-group">
+							<label class="col-sm-3 control-label">{{Widget Reporting dashboard}}</label>
+							<div class="col-sm-3">
+								<select style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_reporting_dashboard">
+									<option value="">{{Valeur par défaut}}</option>
+									<?php
+									echo $widgetDashboard;
+									?>
+								</select>
+							</div>
+						</div>
+						<br>
+
+						<div class=" form-group">
+							<label class="col-sm-3 control-label">{{Widget Reporting mobile}}</label>
+							<div class="col-sm-3">
+								<select style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_reporting_mobile">
+									<option value="">{{Valeur par défaut}}</option>
+									<?php
+									echo $widgetMobile;
+									?>
+								</select>
+							</div>
+						</div>
+						<br>
+
+
+
+
+
 					</fieldset>
 				</form>
 			</div>
@@ -265,7 +326,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 					</tbody>
 				</table><br>
 				<div class="alert-info bg-success">
-					Les tempos peuvent être utilisées pour faire des tests lors d'un contôle : <br />
+					Les tempos peuvent être utilisées pour faire des tests lors d'un contrôle : <br />
 					#tempo1# = Valeur en secondes. Mettre #tempo1# pour récupérer la valeur
 				</div>
 			</div>
