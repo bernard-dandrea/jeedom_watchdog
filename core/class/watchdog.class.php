@@ -45,12 +45,6 @@ class watchdog extends eqLogic
         $ResultatGlobalOK = config::byKey('ResultatGlobalOK', 'watchdog', '1');
         $ResultatGlobalOK = $this->getConfiguration("ResultatGlobalOK", $ResultatGlobalOK);
         $this->setConfiguration("ResultatGlobalOKCourant", $ResultatGlobalOK);
-        if ($ResultatGlobalOK == '1') {
-            $invertBinary = '0';
-        } else {
-            $invertBinary = '1';
-        }
-        $this->setDisplay("invertBinary", $invertBinary);
 
         $VirtualReport = trim($this->getConfiguration("VirtualReport", ''));
         if ($VirtualReport == '')
@@ -60,6 +54,22 @@ class watchdog extends eqLogic
         $ReportOnlyNonOK = config::byKey('VirtualReport', 'ReportOnlyNonOK', '1');
         $ReportOnlyNonOK = $this->getConfiguration("ReportOnlyNonOK", $ReportOnlyNonOK);
         $this->setConfiguration("ReportOnlyNonOKCourant", $ReportOnlyNonOK);
+
+        $template_resultatglobal_dashboard = config::byKey('template_resultatglobal_dashboard', 'watchdog', 'core::default');
+        $template_resultatglobal_dashboard = $this->getConfiguration("template_resultatglobal_dashboard", $template_resultatglobal_dashboard);
+        $this->setConfiguration("template_resultatglobal_dashboard_courant", $template_resultatglobal_dashboard);
+
+        $template_resultatglobal_mobile = config::byKey('template_resultatglobal_mobile', 'watchdog', 'core::default');
+        $template_resultatglobal_mobile = $this->getConfiguration("template_resultatglobal_mobile", $template_resultatglobal_mobile);
+        $this->setConfiguration("template_resultatglobal_mobile_courant", $template_resultatglobal_mobile);
+
+        $template_reporting_dashboard = config::byKey('template_reporting_dashboard', 'watchdog', 'core::default');
+        $template_reporting_dashboard = $this->getConfiguration("template_reporting_dashboard", $template_reporting_dashboard);
+        $this->setConfiguration("template_reporting_dashboard_courant", $template_reporting_dashboard);
+
+        $template_reporting_mobile = config::byKey('template_reporting_mobile', 'watchdog', 'core::default');
+        $template_reporting_mobile = $this->getConfiguration("template_reporting_mobile", $template_reporting_mobile);
+        $this->setConfiguration("template_reporting_mobile_courant", $template_reporting_mobile);
     }
 
     public function postSave()
@@ -108,6 +118,21 @@ class watchdog extends eqLogic
                 $cmdResultatGlobal->save();
             }
         } else {
+            $update_cmdResultatGlobal = false; // pour savoir si il faut faire une MAJ
+
+            // applique les templates à résultat global
+            $template_resultatglobal_dashboard = $this->getConfiguration("template_resultatglobal_dashboard_courant");
+            if ($template_resultatglobal_dashboard <> $cmdResultatGlobal->getTemplate("dashboard", "core::default")) {
+                $cmdResultatGlobal->setTemplate("dashboard", $template_resultatglobal_dashboard);
+                $update_cmdResultatGlobal = true;
+            }
+
+            $template_resultatglobal_mobile = $this->getConfiguration("template_resultatglobal_mobile_courant");
+            if ($template_resultatglobal_mobile <> $cmdResultatGlobal->getTemplate("mobile", "core::default")) {
+                $cmdResultatGlobal->setTemplate("mobile", $template_resultatglobal_mobile);
+                $update_cmdResultatGlobal = true;
+            }
+
             // Applique l'affichage inversé si nécessaire
             $ResultatGlobalOK = $this->getConfiguration("ResultatGlobalOKCourant", "1");
             if ($ResultatGlobalOK == '1') {
@@ -118,8 +143,11 @@ class watchdog extends eqLogic
             $invertBinaryCurrent = $cmdResultatGlobal->getDisplay("invertBinary", '0');
             if ($invertBinary <> $invertBinaryCurrent) {
                 $cmdResultatGlobal->setDisplay("invertBinary", $invertBinary);
-                $cmdResultatGlobal->save();
+                $update_cmdResultatGlobal = true;
             }
+
+            if ($update_cmdResultatGlobal == true)
+                $cmdResultatGlobal->save();
 
             // -----------------------------------------------------
             // Reporting des watchdogs
@@ -160,8 +188,6 @@ class watchdog extends eqLogic
                         $cmdReportWatchdog->setConfiguration('historizeMode', 'none');
                         $cmdReportWatchdog->setConfiguration('historyPurge', '-7 day');
                         $cmdReportWatchdog->setConfiguration('repeatEventManagement', 'never');
-                        $cmdReportWatchdog->setTemplate('dashboard', 'core::line');
-                        $cmdReportWatchdog->setTemplate('mobile', 'core::line');
                         $cmdReportWatchdog->setType('info');
                         $cmdReportWatchdog->setUnite('');
                         $cmdReportWatchdog->setSubType('binary');
@@ -171,6 +197,19 @@ class watchdog extends eqLogic
                     }
 
                     $update_cmdReportWatchdog = false; // pour savoir si il faut faire une MAJ
+
+                    // applique les templates à la commande info dans le virtuel
+                    $template_reporting_dashboard = $this->getConfiguration("template_reporting_dashboard_courant");
+                    if ($template_reporting_dashboard <> $cmdReportWatchdog->getTemplate("dashboard", "core::default")) {
+                        $cmdReportWatchdog->setTemplate("dashboard", $template_reporting_dashboard);
+                        $update_cmdReportWatchdog = true;
+                    }
+
+                    $template_reporting_mobile = $this->getConfiguration("template_reporting_mobile_courant");
+                    if ($template_reporting_mobile <> $cmdReportWatchdog->getTemplate("mobile", "core::default")) {
+                        $cmdReportWatchdog->setTemplate("mobile", $template_reporting_mobile);
+                        $update_cmdReportWatchdog = true;
+                    }
 
                     // aligne l affichage inversé sur celui du Resultat Global
                     $invertBinaryResultatGlobal = $cmdResultatGlobal->getDisplay("invertBinary", '0');
@@ -187,29 +226,21 @@ class watchdog extends eqLogic
                         $update_cmdReportWatchdog = true;
                     }
 
-                    // n'affiche pas le watchdog si pas de condition ET / OU
-                    if ($typeControl <> 'ET' && $typeControl <> 'OU') {
-                        if ($cmdReportWatchdog->getIsVisible() <> '1') {
+                    // affiche le controle quelque soit le résultat
+                    if ($ReportOnlyNonOK <> '1' && $cmdReportWatchdog->getIsVisible() == '0') {
+                        $cmdReportWatchdog->setIsVisible(1);
+                        $update_cmdReportWatchdog = true;
+                    } else {
+                        // récupère le résultat de la commande Resultat global
+                        $WatchdogResultat = $cmdResultatGlobal->execCmd();
+                        // Affiche ou non la commande associée au watchdog en fonction de l'état du watchdog
+                        if ($WatchdogResultat == $whatchdog_ok && $cmdReportWatchdog->getIsVisible() == 1) {
                             $cmdReportWatchdog->setIsVisible(0);
                             $update_cmdReportWatchdog = true;
                         }
-                    } else {
-                        // affiche le controle quelque soit le résultat
-                        if ($ReportOnlyNonOK <> '1' && $cmdReportWatchdog->getIsVisible() == '0') {
+                        if ($WatchdogResultat != $whatchdog_ok && $cmdReportWatchdog->getIsVisible() == 0) {
                             $cmdReportWatchdog->setIsVisible(1);
                             $update_cmdReportWatchdog = true;
-                        } else {
-                            // récupère le résultat de la commande Resultat global
-                            $WatchdogResultat = $cmdResultatGlobal->execCmd();
-                            // Affiche ou non la commande associée au watchdog en fonction de l'état du watchdog
-                            if ($WatchdogResultat == $whatchdog_ok && $cmdReportWatchdog->getIsVisible() == 1) {
-                                $cmdReportWatchdog->setIsVisible(0);
-                                $update_cmdReportWatchdog = true;
-                            }
-                            if ($WatchdogResultat != $whatchdog_ok && $cmdReportWatchdog->getIsVisible() == 0) {
-                                $cmdReportWatchdog->setIsVisible(1);
-                                $update_cmdReportWatchdog = true;
-                            }
                         }
                     }
 
@@ -255,7 +286,7 @@ class watchdog extends eqLogic
             // On sauvegarde le dernier résultat dans AvantdernierResultat
             $cmd->setConfiguration('resultatAvant', $cmd->getConfiguration('resultat'));
             if ($cmd->getLogicalId() != "resultatglobal") { // on ignore resultatglobal
-                $cmd->save();
+                $cmd->save();     // le calcul est effectué dans la procédure presave de la commande
             }
         }
 
@@ -424,7 +455,7 @@ class watchdogCmd extends cmd
         $typeControl = $eqLogic->getConfiguration('typeControl');
         $ideqLogic = $eqLogic->getId();
         if ($typeControl == "") {
-            // La fonction trigger est appellé sur le résultat général des controles, on ne fait rien si on n'est pas en mode "Actions sur chaque cvontrole indépendamment"
+            // La fonction trigger est appellé sur le résultat général des controles, on ne fait rien si on n'est pas en mode "Actions sur chaque controle indépendamment"
 
             log::add('watchdog', 'debug', '╠═════> On lance les actions qui correspondent au passage de [' . $this->getName() . '] à ' . $passe);
 
@@ -463,12 +494,13 @@ class watchdogCmd extends cmd
     }
 
     /*     * *********************Methode d'instance************************* */
-
+    // c'est ici que sont effectués les controles
     public function preSave()
     {
         if ($this->getType() == 'action') return; //On ne fait pas le test si c'est une Commande Action		
         if ($this->getLogicalId() == 'resultatglobal') return; //On ne fait pas le test si c'est la commande 	resultatglobal	
-        log::add('watchdog', 'info', '║ ┌──────────────────────[Sauvegarde du Contrôle ' . $this->getName() . ']────────────────────────────────────────────────────────────────────────────────────');
+        if ($this->getLogicalId() == 'resultatglobal') return; //On ne fait rien si c'est la commande 	refresh	
+        log::add('watchdog', 'info', '║ ┌──────────────────────[Contrôle ' . $this->getName() . ']────────────────────────────────────────────────────────────────────────────────────');
 
         // On va chercher si on est en SAUVEGARDE ou en CRON
         $eqLogic = $this->getEqLogic();
@@ -490,7 +522,7 @@ class watchdogCmd extends cmd
 
             // Si le résultat a changé, il faut actualiser le calcul du résultat global, pour cela, on utilise la variable cmd.configuration.aChange qui traitera le calcul dans postSave
             $this->setConfiguration('aChange', true);
-            //On ne va lancer le trigger que si on est en mode CRON et pas si on est en mode SAVE
+            //On ne va lancer le trigger que si on est en mode CRON/REFRESH et pas si on est en mode SAVE
             if (($dernierLancement == "CRON") || ($dernierLancement == "PREC"))
                 $this->triggerEquip($resultat);
         }
