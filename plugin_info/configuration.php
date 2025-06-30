@@ -56,7 +56,67 @@ if (!isConnect()) {
     </div>
     <br>
 
+    <?php
+    $widgetDashboard = cmd::getSelectOptionsByTypeAndSubtype('info', 'binary', 'dashboard', cmd::availableWidget('dashboard'));
+    $widgetMobile = cmd::getSelectOptionsByTypeAndSubtype('info', 'binary', 'dashboard', cmd::availableWidget('mobile'));
+    ?>
+
+    <div class=" form-group">
+        <label class="col-sm-3 control-label">{{Widget Resultat Global dashboard}}</label>
+        <div class="col-sm-3">
+            <select style="width: 150px;" id="template_resultatglobal_dashboard" class="configKey form-control" data-l1key="template_resultatglobal_dashboard">
+                <option value="">{{Défaut}}</option>
+                <?php
+                echo $widgetDashboard;
+                ?>
+            </select>
+        </div>
+    </div>
+    <br>
+
+    <div class=" form-group">
+        <label class="col-sm-3 control-label">{{Widget Resultat Global mobile}}</label>
+        <div class="col-sm-3">
+            <select style="width: 150px;" id="template_resultatglobal_mobile" class="configKey form-control" data-l1key="template_resultatglobal_mobile">
+                <option value="">{{Défaut}}</option>
+                <?php
+                echo $widgetMobile;
+                ?>
+            </select>
+        </div>
+    </div>
+    <br>
+
+    <div class=" form-group">
+        <label class="col-sm-3 control-label">{{Widget Reporting dashboard}}</label>
+        <div class="col-sm-3">
+            <select style="width: 150px;" id="template_reporting_dashboard" class="configKey form-control" data-l1key="template_reporting_dashboard">
+                <option value="">{{Défaut}}</option>
+                <?php
+                echo $widgetDashboard;
+                ?>
+            </select>
+        </div>
+    </div>
+    <br>
+
+    <div class=" form-group">
+        <label class="col-sm-3 control-label">{{Widget Reporting mobile}}</label>
+        <div class="col-sm-3">
+            <select style="width: 150px;" id="template_reporting_mobile" class="configKey form-control" data-l1key="template_reporting_mobile">
+                <option value="">{{Défaut}}</option>
+                <?php
+                echo $widgetMobile;
+                ?>
+            </select>
+        </div>
+    </div>
+    <br>
+
+
+
 </form>
+
 
 
 <?php include_file('desktop', 'watchdog', 'js', 'watchdog'); ?>
