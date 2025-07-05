@@ -6,12 +6,13 @@
 
 **BETA**
 
-*   Suppression des commentaires et codes inutiles et indentation du code dans watchdog.class.php, watchdog.js et watchdog.php
+*   Refote du code afin d'améliorer la compréhension (suppression des commentaires et codes inutiles et indentation du code, ...) dans watchdog.ajax.php,watchdog.class.php, watchdog.js et watchdog.php
 *   dans watchdog.js, ajout jeedomUtils. pour fonctions dépréciées uniqId et taAutosize
 *   Ajout de la commande Refresh (créée lors de la sauvegarde de l'équipement). On peut lancer un Refresh en cliquant sur l'icone en haut à droite de la tuile.
 *   Ajout dans la configuration du plugin et au niveau de chaque équipement d'un paramètre indiquant si le contrôle est OK lorsque le résultat global est à true ou à false. Cela permet d'indiquer la crosse verte si le résultat des contrôles est False
 *   Reporting des watchdogs dans un virtuel
 *   Possibilité de spécifier le widget à utiliser pour le Résultat Global et le reporting
+*   Ajout de variables pour les équipements pour utilisation dans les conditions et actions
 
 **Version 2025-06-10**
 
