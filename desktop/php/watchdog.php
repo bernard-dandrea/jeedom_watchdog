@@ -383,7 +383,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 						<br>Exemple: envoi d'un mail avec la date de dernière communication
 						<br>
 						* Titre--> Communication perdue avec #title#
-						<br>* Message --> Dernière communication #equip1#[Dernière communication]
+						<br>* Message --> Dernière communication avec #equip1# : value(#equip1#[Dernière communication])
 				</div>
 
 			</div>
