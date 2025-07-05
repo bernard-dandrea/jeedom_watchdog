@@ -95,7 +95,7 @@ $('.listCmdInfoVacances').off('click').on('click', function () {
 		el.value(result.human);
 		jeedom.cmd.displayActionOption(el.value(), '', function (html) {
 			el.closest('.' + type).find('.actionOptions').html(html);
-			taAutosize();
+			jeedomUtils.taAutosize();
 		});
 	});
 
@@ -471,7 +471,7 @@ $("body").delegate(".listAction", 'click', function () {
 		el.value(result.human);
 		jeedom.cmd.displayActionOption(el.value(), '', function (html) {
 			el.closest('.' + type).find('.actionOptions').html(html);
-			taAutosize();
+			jeedomUtils.taAutosize();
 		});
 	});
 });
