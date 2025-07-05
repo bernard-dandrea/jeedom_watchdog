@@ -17,59 +17,45 @@
  */
 
 try {
-    require_once __DIR__ . '/../../../../core/php/core.inc.php';
-    include_file('core', 'authentification', 'php');
-/*
-    if (init('action') == 'launchAction') {
-        watchdog::launchCmd(init('id'));
-		ajax::success();
-    }
-    if (init('action') == 'getStatus') {
-		log::add('watchdog','debug', ' id ' . init('id'));
-        $watchdog = watchdog::byId(init('id'));
-		$return = $watchdog->getConfiguration('activAction');
-		ajax::success($return);
-    }
-	
-    if (init('action') == 'actionAll') {
-		log::add('watchdog','debug', ' id ' . init('id'));
-        watchdog::actionAll(init('id'));
-		ajax::success();
-    }
-	*/
-    if (init('action') == 'testaction') {
-        $watchdog = watchdog::byId(init('id'));
-		    if (!is_object($watchdog)) {
-			  throw new Exception(__('Equipement watchdog introuvable : ', __FILE__) . init('id'));
-			}
-		$comptageid=0;
+	require_once __DIR__ . '/../../../../core/php/core.inc.php';
+	include_file('core', 'authentification', 'php');
+
+
+	if (init('action') == 'testaction') {
+		$watchdog = watchdog::byId(init('id'));
+		if (!is_object($watchdog)) {
+			throw new Exception(__('Equipement watchdog introuvable : ', __FILE__) . init('id'));
+		}
+		$comptageid = 0;  // sert à se positionner sur la bonne action 
 		foreach ($watchdog->getConfiguration('watchdogAction') as $cmd) {
-					if (init('id_action')== $comptageid) {
-						$commandeaTester=$cmd['cmd'];
-						$optionsCommandeaTester=$cmd['options'];
-						//log::add('watchdog','debug', ' optionsCommandeaTester: '.json_encode($optionsCommandeaTester));
-						
-						if (count($watchdog->getCmd()) == 1) {// S'il n'y en a qu'une commande, on va remplacer #controlname# par la valeur, sinon on laisse #controlname#
-								foreach ($watchdog->getCmd() as $eqCmd) {
-									foreach ($optionsCommandeaTester as $key => $option) {
-										$optionsCommandeaTester[$key]=str_replace("#controlname#", $eqCmd->getName(), $option);
-									}				
-								}
-						}
+			if (init('id_action') == $comptageid) {
+				$optionsCommandeaTester = $cmd['options'];
+
+				if (count($watchdog->getCmd()) == 1) { // S'il n'y a qu'une commande, on va remplacer #controlname# par la valeur, sinon on laisse #controlname#
+					foreach ($watchdog->getCmd() as $eqCmd) {
 						foreach ($optionsCommandeaTester as $key => $option) {
-							$optionsCommandeaTester[$key]=str_replace("#title#", $watchdog->getName(), $option);
+							$optionsCommandeaTester[$key] = str_replace("#controlname#", $eqCmd->getName(), $option);
 						}
-						scenarioExpression::createAndExec('action', $commandeaTester, $optionsCommandeaTester);		
 					}
-					$comptageid++;
 				}
+				foreach ($optionsCommandeaTester as $key => $option) {
+					$optionsCommandeaTester[$key] = $watchdog->remplace_parametres($option, $key);
+				}
+				$commandeaTester = $watchdog->remplace_parametres($cmd['cmd']);   // remplace les paramètres dans la commande
+
+				log::add('watchdog', 'debug', '**************************************************************************************************************************');
+				log::add('watchdog', 'debug', '** Exécution de la commande ' . jeedom::toHumanReadable($commandeaTester) . " avec comme option(s) : " . json_encode($optionsCommandeaTester));
+				log::add('watchdog', 'debug', '**************************************************************************************************************************');
+				scenarioExpression::createAndExec('action', $commandeaTester, $optionsCommandeaTester);
+			}
+			$comptageid++;
+		}
 		ajax::success();
-    }	
-	
-			
-    throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
-    /*     * *********Catch exeption*************** */
+	}
+
+
+	throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
+	/*     * *********Catch exeption*************** */
 } catch (Exception $e) {
-    ajax::error(displayExeption($e), $e->getCode());
+	ajax::error(displayExeption($e), $e->getCode());
 }
-?>
