@@ -38,6 +38,25 @@ $('#VirtualReportGlobal').on('click', function () {
 	});
 });
 
+// Selection de l'équipement utilisé en parametre equipX
+$('#equip1').on('click', function () {
+	jeedom.eqLogic.getSelectModal({ eqLogic: { eqType_name: '' } }, function (result) {
+		$('.eqLogicAttr[data-l1key=configuration][data-l2key=equip1]').value(result.human);
+	});
+});
+
+$('#equip2').on('click', function () {
+	jeedom.eqLogic.getSelectModal({ eqLogic: { eqType_name: '' } }, function (result) {
+		$('.eqLogicAttr[data-l1key=configuration][data-l2key=equip2]').value(result.human);
+	});
+});
+
+$('#equip3').on('click', function () {
+	jeedom.eqLogic.getSelectModal({ eqLogic: { eqType_name: '' } }, function (result) {
+		$('.eqLogicAttr[data-l1key=configuration][data-l2key=equip3]').value(result.human);
+	});
+});
+
 $("body").delegate('.bt_removeAction', 'click', function () {
 	var type = $(this).attr('data-type');
 	$(this).closest('.' + type).remove();
@@ -190,7 +209,6 @@ function addCmdToTable(_cmd, type) {
 	if ((init(_cmd.logicalId) == 'refresh')) return;
 
 	if (!isset(_cmd))
-		//var _cmd = {configuration: {}};
 		var _cmd = {};
 	if (!isset(_cmd.configuration))
 		_cmd.configuration = {};
@@ -199,6 +217,7 @@ function addCmdToTable(_cmd, type) {
 	if (!isset(_cmd.subType))
 		_cmd.subType = "watchdog";
 
+	var data_title = '{{}}';
 	switch (_cmd.configuration.resultat) {
 		case 'True':
 			var couleur = 'success';
@@ -209,7 +228,8 @@ function addCmdToTable(_cmd, type) {
 			var icon = '<i class="far fa-thumbs-down" style="color: #ffffff!important;"></i>';
 			break;
 		default:
-			var couleur = 'info';
+			var data_title = '{{Problème avec la formule: la formule doit renvoyer vrai ou Faux. Vous pouvez la tester dans le Testeur d\'expressions (menu Outils)}}';
+			var couleur = 'danger';
 			var icon = '<i class="far fa-question-circle" style="color: #ffffff!important;"></i>';
 	}
 
@@ -223,11 +243,12 @@ function addCmdToTable(_cmd, type) {
 			var iconAvant = '<i class="far fa-thumbs-down" style="color: #ffffff!important;"></i>';
 			break;
 		default:
-			var couleurAvant = 'info';
+
+			var couleurAvant = 'danger';
 			var iconAvant = '<i class="far fa-question-circle" style="color: #ffffff!important;"></i>';
 	}
 
-	var tr = '<tr class="cmd info" >'; //la couleur ne foncitonne pas à cause de info mais on ne peut pas supprimer info
+	var tr = '<tr class="cmd info" >'; //la couleur ne fonctionne pas à cause de info mais on ne peut pas supprimer info
 
 	tr += '<td width=160>';
 
@@ -253,12 +274,12 @@ function addCmdToTable(_cmd, type) {
 	}
 
 	tr += '<td width=150 align=center><span class="cmdAttr label label-' + couleur + '" >' + icon + '</span>';
-	tr += '<span class="cmdAttr label label-' + couleur + '" style="font-weight: bold;" data-l1key="configuration" data-l2key="resultat"></span>';
+	tr += '<span class="cmdAttr label label-' + couleur + '  style="font-weight: bold;" title="' + data_title + '" data-l1key="configuration" data-l2key="resultat"></span>';
 	//tr += '<span class="cmdAttr" style="font-weight: bold;" data-l1key="configuration" data-l2key="resultat"></span>';
 	tr += '</td>';
 	tr += '<td width=40 align=center>';
 
-	tr += '<span style="font-size: 1.5em;"><i class="fa icon_red fa-minus-circle pull-right cmdAction cursor" data-action="remove"></i></span>';
+	tr += '<span style="font-size: 1.5em;"><i class="fa  fa-minus-circle pull-right cmdAction cursor  data-action="remove" ></i></span>';
 	tr += '</td>';
 	tr += '</tr>';
 	//tr += '<tr class="bg-warning"><td class="bg-warning">frgthjkl</td></tr>';
@@ -304,7 +325,7 @@ function printEqLogic(_eqLogic) {
 
 		var resultat = _eqLogic.configuration.dernierEtat;
 		// inverse l icone si l'affichage du Resultat Global est inversé
-		if (_eqLogic.configuration.ResultatGlobalOKCourant == '0') {
+		if (_eqLogic.configuration.ResultatGlobalOK_Courant == '0') {
 			if (resultat == 'True') {
 				resultat = 'False'
 			}
@@ -327,7 +348,7 @@ function printEqLogic(_eqLogic) {
 				var icon = '<i class="far fa-question-circle" style="color: #ffffff!important;"></i>';
 		}
 
-		var tr = '<br><br><legend><i class="fa loisir-weightlift"></i> {{Résultat global des contrôles, méthode ';
+		var tr = '<br><br><legend><i class="fa loisir-weightlift" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7"> {{Résultat global des contrôles, méthode ';
 		tr += typeControl;
 		tr += '}}</legend>	<table class="table "  >';
 		tr += '<tr bgcolor=silver style="width: 100%; border-collapse: collapse; background-color: #e0e2e2;">';
@@ -457,7 +478,7 @@ $("body").delegate(".listAction", 'click', function () {
 
 
 //-------------------------------------
-// Pour remplir facilement le test à faire sur un equipement
+// Assistant pour remplir facilement le test à faire sur un equipement
 //-------------------------------------
 
 $("#table_controles").off('click').on('click', ".listCmdInfo", function () {
@@ -671,7 +692,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo", function () {
 
 						//------------L'utilisateur demande a choisir la commande de l'équipement --
 						// Lancement de l'écran numéro 2/3	
-						jeedom.cmd.getSelectModal({ cmd: {} }, function (result) {
+						jeedom.cmd.getSelectModal({ cmd: { type: 'info' } }, function (result) {
 							var date = new Date();
 
 							chaine = result.human;
