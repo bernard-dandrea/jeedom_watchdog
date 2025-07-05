@@ -63,7 +63,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 		<ul class="nav nav-tabs" role="tablist">
 			<li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
 			<li role="presentation" class="active"><a href="#eqlogictab" aria-controls="home" role="tab" data-toggle="tab"><i class="fa fa-list-alt"></i> {{Watchdog}}</a></li>
-			<li role="presentation"><a href="#controlestab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-stethoscope"></i></i> {{Equipements ou Commandes à surveiller}}</a></li>
+			<li role="presentation"><a href="#controlestab" aria-controls="profile" role="tab" data-toggle="tab"><i class="fas fa-stethoscope"></i></i> {{Contrôles}}</a></li>
 			<li role="presentation"><a href="#infocmd" aria-controls="profile" role="tab" data-toggle="tab"><i class="fa fa-cogs"></i> {{Actions}}</a></li>
 		</ul>
 
@@ -203,7 +203,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							<label class="col-sm-3 control-label">{{Virtuel pour le reporting}}</label>
 							<div class="col-sm-3">
 								<div class="input-group">
-									<input style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="VirtualReport" />
+									<input style="width: 500px;" title='Laisser vide si valeur par défaut' class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="VirtualReport" />
 									<span class="input-group-btn">
 										<a class="btn btn-default cursor" title="Rechercher un équipement" id="VirtualReport"><i class="fas fa-list-alt"></i></a>
 									</span>
@@ -226,7 +226,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 						?>
 						<br><br>
 						<div class=" form-group">
-							<label class="col-sm-3 control-label">{{Widget Resultat Global dashboard}}</label>
+							<label class="col-sm-3 control-label">{{Widget Résultat Global dashboard}}</label>
 							<div class="col-sm-3">
 								<select style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_resultatglobal_dashboard">
 									<option value="">{{Valeur par défaut}}</option>
@@ -239,7 +239,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 						<br>
 
 						<div class=" form-group">
-							<label class="col-sm-3 control-label">{{Widget Resultat Global mobile}}</label>
+							<label class="col-sm-3 control-label">{{Widget Résultat Global mobile}}</label>
 							<div class="col-sm-3">
 								<select style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_resultatglobal_mobile">
 									<option value="">{{Valeur par défaut}}</option>
@@ -276,11 +276,6 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							</div>
 						</div>
 						<br>
-
-
-
-
-
 					</fieldset>
 				</form>
 			</div>
@@ -296,14 +291,11 @@ $eqLogics = eqLogic::byType($plugin->getId());
 				<a id="afficheCalculs" class="btn btn-info btn-sm bt_afficheCalculs pull-right" data-type="action" style="margin-top:-15px;"><i class="fas fa-square-root-alt"></i> {{Afficher les calculs}}</a><a id="masqueCalculs" class="btn btn-warning btn-sm bt_masqueCalculs pull-right" data-type="action" style="margin-top:5px;"><i class="fas fa-square-root-alt"></i> {{Masquer les calculs}}</a>
 				<br>
 
-				<!--<br><br><legend><i class="fa loisir-weightlift"></i> {{Résultat global des contrôles, méthode <?php print $typeControl; ?>}}</legend>
- <table id="table_controles_resultat00000000" class="table  table-condensed ui-sortable table_controles_resultat0000000000">
-</table> -->
 				<!-- ICI la partie qui affiche le résultat global dans le cas d'un mode OU ou d'un ET-->
 				<div id="section_resultatGlobal">
 				</div>
 
-				<legend><i class="fas fa-hourglass-half" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Configuration des tempos}}</span></legend>
+				<legend><i class="icon jeedomapp-settings" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Variables}}</span></legend>
 
 				<table border="0">
 					<tbody>
@@ -325,9 +317,57 @@ $eqLogics = eqLogic::byType($plugin->getId());
 						</tr>
 					</tbody>
 				</table><br>
+
 				<div class="alert-info bg-success">
-					Les tempos peuvent être utilisées pour faire des tests lors d'un contrôle : <br />
-					#tempo1# = Valeur en secondes. Mettre #tempo1# pour récupérer la valeur
+					Les variables tempo peuvent être utilisées pour faire des tests dans un contrôle. Par exemple, mettre #tempo1# pour récupérer la valeur de la tempo1 dans la formule du contrôle
+					<br>
+				</div>
+				<br>
+				<table border="0">
+					<tbody>
+						<tr>
+							<td style="text-align: right; width: 100px;"><b>Equipement 1</b></td>
+							<td>
+								<div class="input-group">
+									<input style="width: 300px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="equip1" />
+									<span class="input-group-btn">
+										<a class="btn btn-default cursor" title="Rechercher un équipement" id="equip1"><i class="fas fa-list-alt"></i></a>
+									</span>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 100px;"><b>Equipement 2</b></td>
+							<td>
+								<div class="input-group">
+									<input style="width: 300px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="equip2" />
+									<span class="input-group-btn">
+										<a class="btn btn-default cursor" title="Rechercher un équipement" id="equip2"><i class="fas fa-list-alt"></i></a>
+									</span>
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 100px;"><b>Equipement 3</b></td>
+							<td>
+								<div class="input-group">
+									<input style="width: 300px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="equip3" />
+									<span class="input-group-btn">
+										<a class="btn btn-default cursor" title="Rechercher un équipement" id="equip3"><i class="fas fa-list-alt"></i></a>
+									</span>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table><br>
+
+				<div class="alert-info bg-success">
+					Les variables équipements peuvent être utilisées pour faire des tests dans un contrôle. Par exemple, mettre #equip1# pour récupérer l'équipement 1 dans la formule du contrôle.<br><br>
+					Exemple de formule: <br><br>
+					* tester la dernière communication d'un équipement 1 --> (#timestamp# - strtotime(lastCommunication(##equip1##))) > #tempo1#<br>
+					* tester le résultat d'une commande de l'équipement 2 --> value(#equip2#[Statut]) == 1
+
+					<br>
 				</div>
 			</div>
 			<div role="tabpanel" class="tab-pane" id="infocmd">
@@ -335,22 +375,16 @@ $eqLogics = eqLogic::byType($plugin->getId());
 					<div id="table_actions"></div>
 				</form>
 				<br><a class="btn btn-success btn-sm bt_addAction pull-left"><i class="fa fa-plus-circle"></i>Ajouter une action</a><br><br>
-				<?php if ($typeControl == "") { ?>
-					<br><br>
-					<div class="alert-info bg-success">
-						<b>#controlname#</b> = Nom du contrôle qui a déclenché l'action. Mettre #controlname# dans <b>Titre</b> ou dans <b>Message</b> pour y récupérer la valeur<br />
-						<b>#title#</b> = Nom du Watchdog. Mettre #title# dans <b>Titre</b> ou dans <b>Message</b> pour y récupérer la valeur
-					</div>
-				<?php
-				} else { ?>
-					<br><br>
-					<div class="alert-info bg-success">
-						<b>#title#</b> = Nom du Watchdog. Mettre #title# dans <b>Titre</b> ou dans <b>Message</b> pour y récupérer la valeur
-					</div>
-				<?php
-				}
 
-				?>
+				<br><br>
+				<div class="alert-info bg-success">
+					<b>Vous pouvez #title# pour récupérer le nom du watchdog ou #controlname# (uniquement dans la configuration 'Actions sur chaque contrôle indépendemment')
+						<br><br>Vous pouvez également utiliser les variables #equipX# et #tempoX# dans les paramètres des commandes <br>
+						<br>Exemple: envoi d'un mail avec la date de dernière communication
+						<br>
+						* Titre--> Communication perdue avec #title#
+						<br>* Message --> Dernière communication #equip1#[Dernière communication]
+				</div>
 
 			</div>
 		</div>
