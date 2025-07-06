@@ -166,29 +166,23 @@ $eqLogics = eqLogic::byType($plugin->getId());
 
 						<div class="alert-info bg-success">
 							Il existe trois modes de fonctionnement : <br>
-							* Actions sur chaque contrôle indépendamment : Ce mode teste indépendamment chaque contrôle et déclenche les actions quand ce contrôle a changé d'état. Dans cette configuration, le Résultat Global n'est pas géré.<br>
-							* Actions sur l'ensemble des contrôles (avec méthode OU) : Ce mode teste le résultat global des contrôles en y appliquant un test "OU" entre chaque contrôle. Il déclenche les actions quand le résultat global a changé d'état.<br>
-							* Actions sur l'ensemble des contrôles (avec méthode ET) : Ce mode teste le résultat global des contrôles en y appliquant un test "ET" entre chaque contrôle. Il déclenche les actions quand le résultat global a changé d'état. </div>
+							* Actions sur chaque contrôle indépendamment : Ce mode teste indépendamment chaque contrôle et déclenche les actions suivant le mode de fonctionnement des actions (paramètre suivant). Dans cette configuration, le Résultat Global n'est pas géré.<br>
+							* Méthode OU : Ce mode teste le résultat global des contrôles en appliquant un test "OU" entre chaque contrôle (le résultat global est vrai si au moins un des controles est vrai). A la fin des contrôles, les actions sont lancées suivant le mode de fonctionnement des actions (paramètre suivant).<br>
+							* Méthode ET : Ce mode teste le résultat global des contrôles en appliquant un test "ET" entre chaque contrôle  (le résultat global est vrai si tous les controles sont vrais).  A la fin des contrôles, les actions sont lancées suivant le mode de fonctionnement des actions (paramètre suivant).</div>
 
 						<br><br>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">{{Mode de fonctionnement des actions}}</label>
 							<div class="col-sm-3">
 								<select style="width: 500px;" id="sel_object" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="typeAction">
-									<option value="">{{Lancer une action uniquement si le contrôle change de valeur (par défaut)}}</option>
-									<option value="ALL">{{Lancer une action à chaque controle en fonction du résultat}}</option>
+									<option value="">{{Lancer les actions uniquement si le contrôle changé de valeur (par défaut)}}</option>
+									<option value="ALL">{{Lancer les actions même si le contrôle n'a pas changé de valeur}}</option>
 								</select>
 							</div><br><br>
 
 						</div>
 
-						<div class="alert-info bg-success">
-							Il existe deux modes de fonctionnement : <br>
-							* Lancer une action uniquement si le contrôle change de valeur : Ce mode vous prévient quand le contrôle effectué a changé d'état<br>
-							* Lancer une action à chaque controle en fonction du résultat : Ce mode execute à chaque contrôle l'action qui correspond au résultat du contrôle.<br>
-						</div>
-
-						<legend><i class="icon kiko-book-open" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Résultat Global}}</span></legend>
+						<legend><i class="icon kiko-check-line" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Résultat Global}}</span></legend>
 						<div class=" form-group">
 							<label class="col-sm-3 control-label">{{Le contrôle est OK lors le Résultat Global est égal à}}</label>
 							<div class="col-sm-3">
@@ -199,11 +193,13 @@ $eqLogics = eqLogic::byType($plugin->getId());
 								</select>
 							</div>
 						</div> <br>
+						
+						<legend><i class="icon kiko-book-open" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Reporting}}</span></legend>
 						<div class=" form-group">
 							<label class="col-sm-3 control-label">{{Virtuel pour le reporting}}</label>
 							<div class="col-sm-3">
 								<div class="input-group">
-									<input style="width: 500px;" title='Laisser vide si valeur par défaut' class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="VirtualReport" />
+									<input style="width: 500px;" title='Laisser vide si valeur par défaut. Mettre / si on ne veut pas reporting même si il y en a un de défini par défaut.' class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="VirtualReport" />
 									<span class="input-group-btn">
 										<a class="btn btn-default cursor" title="Rechercher un équipement" id="VirtualReport"><i class="fas fa-list-alt"></i></a>
 									</span>
@@ -364,7 +360,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 				<div class="alert-info bg-success">
 					Les variables équipements peuvent être utilisées pour faire des tests dans un contrôle. Par exemple, mettre #equip1# pour récupérer l'équipement 1 dans la formule du contrôle.<br><br>
 					Exemple de formule: <br><br>
-					* tester la dernière communication d'un équipement 1 --> (#timestamp# - strtotime(lastCommunication(##equip1##))) > #tempo1#<br>
+					* tester la dernière communication d'un équipement 1 --> (#timestamp# - strtotime(lastCommunication(#equip1#))) > #tempo1#<br>
 					* tester le résultat d'une commande de l'équipement 2 --> value(#equip2#[Statut]) == 1
 
 					<br>
