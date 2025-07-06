@@ -25,7 +25,7 @@ class watchdog extends eqLogic
 
     public function preInsert()
     {
-        $watchdog = $this;  
+        $watchdog = $this;
         $watchdog->setIsEnable(1);
         $watchdog->setIsVisible(1);
         $watchdog->setConfiguration('autorefresh', '*/5 * * * *');
@@ -33,7 +33,7 @@ class watchdog extends eqLogic
 
     public function preSave()
     {
-        $watchdog = $this;  
+        $watchdog = $this;
         log::add('watchdog', 'info', '┌──────────────────────[Sauvegarde du Watchdog ' . $watchdog->getName() . ']────────────────────────────────────────────────────────────────────────────────────');
 
         if ((substr($watchdog->getConfiguration('dernierLancement'), 0, 7)) == "PRECRON") {
@@ -47,8 +47,10 @@ class watchdog extends eqLogic
         $watchdog->setConfiguration("ResultatGlobalOK_Courant", $ResultatGlobalOK);
 
         $VirtualReport = trim($watchdog->getConfiguration("VirtualReport", ''));
-        if ($VirtualReport == '')
+        if (trim($VirtualReport) == '')
             $VirtualReport = trim(config::byKey('VirtualReport', 'watchdog', ''));
+        if (trim($VirtualReport) == '/')
+            $VirtualReport = '';
         $watchdog->setConfiguration("VirtualReport_Courant", $VirtualReport);
 
         $ReportOnlyNonOK = config::byKey('VirtualReport', 'ReportOnlyNonOK', '1');
@@ -75,19 +77,19 @@ class watchdog extends eqLogic
     public function postSave()
     {
 
-        $watchdog = $this; 
-        
+        $watchdog = $this;
+
         // -----------------------------------------------------
         // Commande refresh
         // -----------------------------------------------------
 
         unset($cmdRefresh);
-        $cmdRefresh = $this->getCmd(null, 'refresh');
+        $cmdRefresh = $watchdog->getCmd(null, 'refresh');
         if (!is_object($cmdRefresh)) {
-            log::add('watchdog', 'debug', '╠═══> Ajout de la commande action refresh à ' . $this->getName());
+            log::add('watchdog', 'debug', '╠═══> Ajout de la commande action refresh à ' . $watchdog->getName());
             $cmdRefresh = new watchdogCmd();
             $cmdRefresh->setName('Refresh');
-            $cmdRefresh->setEqLogic_id($this->getId());
+            $cmdRefresh->setEqLogic_id($watchdog->getId());
             $cmdRefresh->setType('action');
             $cmdRefresh->setSubType('other');
             $cmdRefresh->setLogicalId('refresh');
@@ -100,23 +102,23 @@ class watchdog extends eqLogic
         // Commande Resultat Global
         // -----------------------------------------------------
         unset($cmdResultatGlobal);
-        $cmdResultatGlobal = $this->getCmd(null, "resultatglobal");
+        $cmdResultatGlobal = $watchdog->getCmd(null, "resultatglobal");
         if (!is_object($cmdResultatGlobal)) {
-            log::add('watchdog', 'debug', '╠═══> Ajout de la commande info resultatglobal à ' . $this->getName());
+            log::add('watchdog', 'debug', '╠═══> Ajout de la commande info resultatglobal à ' . $watchdog->getName());
             $cmdResultatGlobal = new watchdogCmd();
             $cmdResultatGlobal->setType('info');
             $cmdResultatGlobal->setLogicalId("resultatglobal");
             $cmdResultatGlobal->setSubType('binary');
-            $cmdResultatGlobal->setEqLogic_id($this->getId());
+            $cmdResultatGlobal->setEqLogic_id($watchdog->getId());
             $cmdResultatGlobal->setName("Résultat Global");
             $cmdResultatGlobal->setIsVisible(1);
             $cmdResultatGlobal->save();
         }
 
         // ne gère pas le Resultat Global si pas de condition ET / OU
-        $typeControl = $this->getConfiguration('typeControl');
+        $typeControl = $watchdog->getConfiguration('typeControl');
         if ($typeControl <> 'ET' && $typeControl <> 'OU') {
-            if ($cmdResultatGlobal->getIsVisible() <> '1') {
+            if ($cmdResultatGlobal->getIsVisible() == '1') {
                 $cmdResultatGlobal->setIsVisible(0);
                 $cmdResultatGlobal->save();
             }
@@ -135,20 +137,20 @@ class watchdog extends eqLogic
             }
 
             // applique les templates à résultat global
-            $template_resultatglobal_dashboard = $this->getConfiguration("template_resultatglobal_dashboard_Courant");
+            $template_resultatglobal_dashboard = $watchdog->getConfiguration("template_resultatglobal_dashboard_Courant");
             if ($template_resultatglobal_dashboard <> $cmdResultatGlobal->getTemplate("dashboard", "core::default")) {
                 $cmdResultatGlobal->setTemplate("dashboard", $template_resultatglobal_dashboard);
                 $update_cmdResultatGlobal = true;
             }
 
-            $template_resultatglobal_mobile = $this->getConfiguration("template_resultatglobal_mobile_Courant");
+            $template_resultatglobal_mobile = $watchdog->getConfiguration("template_resultatglobal_mobile_Courant");
             if ($template_resultatglobal_mobile <> $cmdResultatGlobal->getTemplate("mobile", "core::default")) {
                 $cmdResultatGlobal->setTemplate("mobile", $template_resultatglobal_mobile);
                 $update_cmdResultatGlobal = true;
             }
 
             // Applique l'affichage inversé si nécessaire
-            $ResultatGlobalOK = $this->getConfiguration("ResultatGlobalOK_Courant", "1");
+            $ResultatGlobalOK = $watchdog->getConfiguration("ResultatGlobalOK_Courant", "1");
             if ($ResultatGlobalOK == '1') {
                 $invertBinary = '0';
             } else {
@@ -166,14 +168,14 @@ class watchdog extends eqLogic
             // -----------------------------------------------------
             // Reporting des watchdogs
             // -----------------------------------------------------
-            $VirtualReportName = $this->getConfiguration("VirtualReport_Courant");
+            $VirtualReportName = $watchdog->getConfiguration("VirtualReport_Courant");
 
             if (trim($VirtualReportName) <> '') {
 
-                $ReportOnlyNonOK = $this->getConfiguration("ReportOnlyNonOK_Courant");
+                $ReportOnlyNonOK = $watchdog->getConfiguration("ReportOnlyNonOK_Courant");
 
                 $whatchdog_ok = 1; // indique quelle est la valeur de ResultatGlobal pour laquelle le whatchdog est OK
-                if ($this->getConfiguration("invertBinary", '0') == '1')
+                if ($watchdog->getConfiguration("invertBinary", '0') == '1')
                     $whatchdog_ok = '0';
 
                 unset($eqVirtualReport);
@@ -188,16 +190,16 @@ class watchdog extends eqLogic
                     $eqVirtualReportId = $eqVirtualReport->getId();
 
                     // récupère la commande correspondant à l'Id du watchdog
-                    $eqLogicId = $this->getId();
+                    $watchdogId = $watchdog->getId();
                     unset($cmdReportWatchdog);
-                    $cmdReportWatchdog = cmd::byEqLogicIdAndLogicalId($eqVirtualReportId, $eqLogicId);
+                    $cmdReportWatchdog = cmd::byEqLogicIdAndLogicalId($eqVirtualReportId, $watchdogId);
                     if (!is_object($cmdReportWatchdog)) {
                         // crée la commande correspondant au watchdog dans le virtuel du reporting
-                        log::add('watchdog', 'debug', '╠═══> Création dans le virtuel de reporting ' . $VirtualReportName . ' de la commande correspondant au watchdog ' . $this->getName());
+                        log::add('watchdog', 'debug', '╠═══> Création dans le virtuel de reporting ' . $VirtualReportName . ' de la commande correspondant au watchdog ' . $watchdog->getName());
                         $cmdReportWatchdog = new virtualCmd();
-                        $cmdReportWatchdog->setName($this->getName());
+                        $cmdReportWatchdog->setName($watchdog->getName());
                         $cmdReportWatchdog->setEqLogic_id($eqVirtualReportId);
-                        $cmdReportWatchdog->setLogicalId($eqLogicId);
+                        $cmdReportWatchdog->setLogicalId($watchdogId);
                         $cmdReportWatchdog->setIsHistorized(1);
                         $cmdReportWatchdog->setConfiguration('historizeMode', 'none');
                         $cmdReportWatchdog->setConfiguration('historyPurge', '-7 day');
@@ -213,13 +215,13 @@ class watchdog extends eqLogic
                     $update_cmdReportWatchdog = false; // pour savoir si il faut faire une MAJ
 
                     // applique les templates à la commande info dans le virtuel
-                    $template_reporting_dashboard = $this->getConfiguration("template_reporting_dashboard_Courant");
+                    $template_reporting_dashboard = $watchdog->getConfiguration("template_reporting_dashboard_Courant");
                     if ($template_reporting_dashboard <> $cmdReportWatchdog->getTemplate("dashboard", "core::default")) {
                         $cmdReportWatchdog->setTemplate("dashboard", $template_reporting_dashboard);
                         $update_cmdReportWatchdog = true;
                     }
 
-                    $template_reporting_mobile = $this->getConfiguration("template_reporting_mobile_Courant");
+                    $template_reporting_mobile = $watchdog->getConfiguration("template_reporting_mobile_Courant");
                     if ($template_reporting_mobile <> $cmdReportWatchdog->getTemplate("mobile", "core::default")) {
                         $cmdReportWatchdog->setTemplate("mobile", $template_reporting_mobile);
                         $update_cmdReportWatchdog = true;
@@ -267,6 +269,51 @@ class watchdog extends eqLogic
         log::add('watchdog', 'info', "└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────");
     }
 
+    // Lancement des watchdogs éligibles (selon les paramètres du CRON)
+    public static function cron()
+    {
+        $cron_update = false;  // pour afficher les messages d entete une seule fois
+
+        foreach (self::byType('watchdog') as $watchdog) {
+            $autorefresh = $watchdog->getConfiguration('autorefresh');
+            if ($watchdog->getIsEnable() == 1 && $autorefresh != '') {
+                try {
+                    $c = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
+                    if ($c->isDue()) {
+                        if ($cron_update == false) {
+                            $cron_update = true;
+                            log::add('watchdog', 'info', '╔══════════════════════[Lancement des Watchdogs par le CRON ]═══════════════════════════════════════════');
+                            log::add('watchdog', 'info', "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════");
+                        }
+                        $watchdog->whatchdog_Update();
+                    }
+                } catch (Exception $exc) {
+                    log::add('watchdog', 'error', __('Expression cron non valide pour ', __FILE__) . $watchdog->getHumanName() . ' : ' . $autorefresh);
+                }
+            }
+        }
+        if ($cron_update == true) {
+            log::add('watchdog', 'info', '╔══════════════════════[Fin du lancement des Watchdogs par le CRON ]════════════════════════════════════');
+            log::add('watchdog', 'info', "╚═══════════════════════════════════════════════════════════════════════════════════════════════════════");
+        }
+    }
+
+    // Exécution des controles et actions d'un watchdog suite à fonction update ou refresh
+    public function whatchdog_Update()
+    {
+        $watchdog = $this;
+        try {
+            $watchdog->setConfiguration('avantDernierLancement', $watchdog->getConfiguration('dernierLancement'));
+            $watchdog->setConfiguration('dernierLancement', 'PRECRON ' . date("d.m.Y") . " " . date("H:i:s")); // PRECON c'est pour signaler que le CRON va etre sauvegarder
+
+            log::add('watchdog', 'info', '╔══════════════════════[Lancement du Watchdog ' . $watchdog->getName() . ']════════════════════════════════════════════════════════════════════════════');
+            $watchdog->lancerControle();
+            log::add('watchdog', 'info', "╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════");
+        } catch (Exception $exc) {
+            log::add('watchdog', 'error', __('Erreur pour ', __FILE__) . $watchdog->getHumanName() . ' : ' . $exc->getMessage());
+        }
+        $watchdog->save();
+    }
     public function lancerControle()
     {
 
@@ -308,7 +355,7 @@ class watchdog extends eqLogic
                 $controle->save();     // le calcul est effectué dans la procédure presave de la classe watchdogcmd
             }
         }
-
+        log::add('watchdog', 'debug', '╠═╦══> Calcul du résultat Global :===================');
         // On va faire le test GLOBAL
         $typeControl = $watchdog->getConfiguration('typeControl');
         if ($typeControl != "") {    // Que si en OU ou en ET
@@ -360,7 +407,8 @@ class watchdog extends eqLogic
                 log::add('watchdog', 'debug', 'Mode action à chaque contrôle : Désactivation du Résultat Précédent');
             }
 
-            // On est ici sur le résultat général des controles, on ne fait rien si on est en mode "Actions sur chaque controle indépendamment"
+            // On est ici sur le résultat général des controles
+            // on ne fait rien si on est en mode "Actions sur chaque controle indépendamment" car le lancement des actions est traité dans le presave
             $typeControl = $watchdog->getConfiguration('typeControl');
             if ($typeControl != "") {
                 if ($resultatPrecedent != $leResultatdelaBoucle) {
@@ -403,40 +451,7 @@ class watchdog extends eqLogic
             }
         }
     }
-    // Lancement des watchdogs éligibles (selon les paramètres du CRON)
-    public static function update()
-    {
-        foreach (self::byType('watchdog') as $watchdog) {
-            $autorefresh = $watchdog->getConfiguration('autorefresh');
-            if ($watchdog->getIsEnable() == 1 && $autorefresh != '') {
-                try {
-                    $c = new Cron\CronExpression($autorefresh, new Cron\FieldFactory);
-                    if ($c->isDue()) {
-                        $watchdog->whatchdog_Update();
-                    }
-                } catch (Exception $exc) {
-                    log::add('watchdog', 'error', __('Expression cron non valide pour ', __FILE__) . $watchdog->getHumanName() . ' : ' . $autorefresh);
-                }
-            }
-        }
-    }
 
-    // Exécution des controles et actions d'un watchdog suite à fonction update ou refresh
-    public function whatchdog_Update()
-    {
-        $watchdog = $this;
-        try {
-            $watchdog->setConfiguration('avantDernierLancement', $watchdog->getConfiguration('dernierLancement'));
-            $watchdog->setConfiguration('dernierLancement', 'PRECRON ' . date("d.m.Y") . " " . date("H:i:s")); // PRECON c'est pour signaler que le CRON va etre sauvegarder
-
-            log::add('watchdog', 'info', '╔══════════════════════[Lancement du Watchdog ' . $watchdog->getName() . ']════════════════════════════════════════════════════════════════════════════');
-            $watchdog->lancerControle();
-            log::add('watchdog', 'info', "╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════");
-        } catch (Exception $exc) {
-            log::add('watchdog', 'error', __('Erreur pour ', __FILE__) . $watchdog->getHumanName() . ' : ' . $exc->getMessage());
-        }
-        $watchdog->save();
-    }
     // Remplace les parametres dans les expressions et options
     public function remplace_parametres($_string, $_key = '')
     {
@@ -510,99 +525,65 @@ class watchdog extends eqLogic
 class watchdogCmd extends cmd
 {
 
-    // Lance les actions de l'équipement
-    public function LanceActionSurChaqueControleIndependamment($resultat)
-    {        
-        $condition = $this;  
-        $watchdog = $condition->getEqLogic();
-        $typeControl = $watchdog->getConfiguration('typeControl');
-        $watchdogID = $watchdog->getId();
 
-        // La fonction est appellée sur le résultat général des controles, on ne fait rien si on n'est pas en mode "Actions sur chaque controle indépendamment"
-        if ($typeControl == "") {
-
-            log::add('watchdog', 'debug', '╠═════> On lance les actions qui correspondent au passage de [' . $condition->getName() . '] à ' . $resultat);
-
-            if ($watchdog->getConfiguration('logspecifique'))
-                log::add('watchdog_' . $watchdogID, 'info', '╔══════════════════════[' . $condition->getName() . ' est passé à ' . $resultat . ']════════════════════════════════════════════════════════════════════════════');
-
-            foreach ($watchdog->getConfiguration("watchdogAction") as $action) {
-
-                $options = [];
-                if (isset($action['options'])) $options = $action['options'];
-                if (($action['actionType'] == $resultat) && $options['enable'] == '1') {
-
-                    // On va remplacer les variables dans tous les champs du array "options"
-                    foreach ($options as $key => $option) {
-                        $option = str_ireplace("#controlname#", $this->getName(), $option);
-                        $option = $watchdog->remplace_parametres($option, $key);  // remplace les parametres utilisés dans les commandes action
-                        $options[$key] = $option;
-                    }
-                    $commande_action = $watchdog->remplace_parametres($action['cmd']);  // remplace les paramètres dans la commande
-
-                    log::add('watchdog', 'debug', '╠══════> Exécution de la commande ' . jeedom::toHumanReadable($commande_action) . " avec comme option(s) : " . json_encode($options));
-                    if ($options['log'] == '1') {
-                        log::add('watchdog_' . $watchdogID, 'info', '╠══════> Exécution de la commande ' . jeedom::toHumanReadable($commande_action) . " avec comme option(s) : " . json_encode($options));
-                    }
-                    try {
-                        scenarioExpression::createAndExec('action', $commande_action, $options);
-                    } catch (Exception $e) {
-                        log::add('watchdog', 'error', __('function LanceActionSurChaqueControleIndependamment : Erreur lors de l\'éxecution de ', __FILE__) . $commande_action . __('. Détails : ', __FILE__) . $e->getMessage());
-                    }
-                }
-            }
-            if ($watchdog->getConfiguration('logspecifique'))
-                log::add('watchdog_' . $watchdogID, 'info', '╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
-        }
-    }
     // c'est ici que sont effectués les controles
     // la commande info contient les éléments du controle
     public function preSave()
     {
+
         if ($this->getType() == 'action') return; //On ne fait pas le test si c'est une Commande Action		
         if ($this->getLogicalId() == 'resultatglobal') return; //On ne fait pas le test si c'est la commande 	resultatglobal	
-        
-        $condition = $this;  
+
+        $condition = $this;
         $watchdog = $this->getEqLogic();
-  
+
         log::add('watchdog', 'info', '║ ┌──────────────────────[Contrôle ' . $watchdog->getName() . ']────────────────────────────────────────────────────────────────────────────────────');
-                // On va chercher si on est en SAUVEGARDE ou en CRON
-        $dernierLancement = $watchdog->getConfiguration('dernierLancement');
-        $dernierLancement = substr($dernierLancement, 0, 4);
+
 
         $resultatPrecedent = $condition->getConfiguration('resultat');
 
-        log::add('watchdog', 'debug', '║ │ ╠═╦═>     Execution du contrôle [' . $condition->getName() . ']');
-        log::add('watchdog', 'debug', '║ │ ║ ╚═╦═>   ' . jeedom::toHumanReadable($condition->getConfiguration('controle')));
-        $resultat = self::TesteCondition($condition->getConfiguration('controle'));
+        $_string = $condition->getConfiguration('controle');
+        $resultat = self::TesteCondition($_string);
         log::add('watchdog', 'debug', '║ │ ║   ╚═══> Resultat : ' . $resultat);
 
-        $_string = $condition->getConfiguration('controle');
-
-        if ($resultatPrecedent != $resultat) {
+        // Si le résultat a changé, il faut actualiser le calcul du résultat global, pour cela, on utilise la variable cmd.configuration.aChange qui traitera le calcul dans postSave
+        if ($resultatPrecedent  != $resultat) {
+            $aChange = True;
             $condition->setConfiguration('resultat', $resultat);
+        } else {
+            $aChange = False;
+        }
 
-            // Si le résultat a changé, il faut actualiser le calcul du résultat global, pour cela, on utilise la variable cmd.configuration.aChange qui traitera le calcul dans postSave
-            $condition->setConfiguration('aChange', true);
-            //On ne va lancer les actions que si on est en mode CRON/REFRESH et pas si on est en mode SAVE
-            // et uniquement si on est en mode "Actions sur chaque controle indépendamment"
-            if (($dernierLancement == "CRON") || ($dernierLancement == "PREC"))
-                $condition->LanceActionSurChaqueControleIndependamment($resultat);
+        $condition->setConfiguration('aChange', $aChange);
+
+        // On va chercher si on est en SAUVEGARDE ou en CRON
+        $dernierLancement = $watchdog->getConfiguration('dernierLancement');
+        $dernierLancement = substr($dernierLancement, 0, 4);
+        //On ne va lancer les actions que si on est en mode CRON/REFRESH et pas si on est en mode SAVE
+        if ($dernierLancement != "SAVE") {
+            // uniquement si on est en mode "Actions sur chaque controle indépendamment"
+            if ($watchdog->getConfiguration('typeControl') == '') {
+                // gère le type d action
+                if ($aChange == True || $watchdog->getConfiguration('typeAction', '') == 'ALL') {
+                    $condition->LanceActionSurChaqueControleIndependamment($resultat);
+                }
+            }
         }
     }
 
     public function TesteCondition($_string)
     {
-        $scenario = null;        
-        $condition = $this;  
+        $scenario = null;
+        $condition = $this;
         $watchdog = $this->getEqLogic();
 
         // remplace les parametres
         $_string = $watchdog->remplace_parametres($_string);
-        $_string = str_replace("#internalAddr#", '"' . config::byKey('internalAddr') . '"', $_string);  // généré par l'assistant sur controle IP
+        $_string = str_replace("#internalAddr#", '"' . config::byKey('internalAddr') . '"', $_string);  // généré par l'assistant sur controle IP de jeedom
 
         $fromHumanReadable = jeedom::fromHumanReadable($_string);
-        $toHumanReadable = jeedom::toHumanReadable($_string);     
+        $toHumanReadable = jeedom::toHumanReadable($_string);
+        log::add('watchdog', 'debug', '║ │ ║ ╚═╦═>   ' . $fromHumanReadable);
         log::add('watchdog', 'debug', '║ │ ║ ╚═╦═>   ' . $toHumanReadable);
 
         $condition->setConfiguration('calcul', scenarioExpression::setTags($fromHumanReadable));  // stocke les valeurs du calcul
@@ -618,13 +599,60 @@ class watchdogCmd extends cmd
 
         return $return;
     }
+    // Lance les actions de l'équipement
+    public function LanceActionSurChaqueControleIndependamment($resultat)
+    {
+        $condition = $this;
+        $watchdog = $condition->getEqLogic();
+        $typeControl = $watchdog->getConfiguration('typeControl');
+        $watchdogID = $watchdog->getId();
+        /*
+       // La fonction est appellée sur le résultat général des controles, on ne fait rien si on n'est pas en mode "Actions sur chaque controle indépendamment"
+       if ($typeControl == "") {
+*/
+        log::add('watchdog', 'debug', '╠═════> On lance les actions qui correspondent au passage de [' . $condition->getName() . '] à ' . $resultat);
 
+        if ($watchdog->getConfiguration('logspecifique'))
+            log::add('watchdog_' . $watchdogID, 'info', '╔══════════════════════[' . $condition->getName() . ' est passé à ' . $resultat . ']════════════════════════════════════════════════════════════════════════════');
+
+        foreach ($watchdog->getConfiguration("watchdogAction") as $action) {
+
+            $options = [];
+            if (isset($action['options'])) $options = $action['options'];
+            if (($action['actionType'] == $resultat) && $options['enable'] == '1') {
+
+                // On va remplacer les variables dans tous les champs du array "options"
+                foreach ($options as $key => $option) {
+                    $option = str_ireplace("#controlname#", $condition->getName(), $option);
+                    $option = $watchdog->remplace_parametres($option, $key);  // remplace les parametres utilisés dans les commandes action
+                    $options[$key] = $option;
+                }
+                $commande_action = $watchdog->remplace_parametres($action['cmd']);  // remplace les paramètres dans la commande
+
+                log::add('watchdog', 'debug', '╠══════> Exécution de la commande ' . jeedom::toHumanReadable($commande_action) . " avec comme option(s) : " . json_encode($options));
+                if ($options['log'] == '1') {
+                    log::add('watchdog_' . $watchdogID, 'info', '╠══════> Exécution de la commande ' . jeedom::toHumanReadable($commande_action) . " avec comme option(s) : " . json_encode($options));
+                }
+                try {
+                    scenarioExpression::createAndExec('action', $commande_action, $options);
+                } catch (Exception $e) {
+                    log::add('watchdog', 'error', __('function LanceActionSurChaqueControleIndependamment : Erreur lors de l\'éxecution de ', __FILE__) . $commande_action . __('. Détails : ', __FILE__) . $e->getMessage());
+                }
+            }
+        }
+        if ($watchdog->getConfiguration('logspecifique'))
+            log::add('watchdog_' . $watchdogID, 'info', '╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
+
+        /*
+           }
+   */
+    }
     public function postSave()
     {
         if ($this->getType() == 'action') return; //On ne fait pas le test si c'est une Commande Action		
         if ($this->getLogicalId() == 'resultatglobal') return; //On ne fait pas le test si c'est la commande 	resultatglobal	
 
-        $condition = $this;  
+        $condition = $this;
         if ($condition->getConfiguration('aChange')) {
             // Cette boucle est déclenchée quand le résultat du controle a changé, il faut ainsi relancer le save du resultat global
             $condition->setConfiguration('aChange', false);
@@ -648,13 +676,14 @@ class watchdogCmd extends cmd
     public function execute($_options = array())
     {
         // Refresh du watchdog
+        $condition = $this;
         $watchdog = $this->getEqLogic();
 
         if (!is_object($watchdog) || $watchdog->getIsEnable() != 1) {
             throw new \Exception(__('Equipement desactivé impossible d\éxecuter la commande : ' . $this->getHumanName(), __FILE__));
         }
 
-        if ($this->getLogicalId() == 'refresh') {
+        if ($condition->getLogicalId() == 'refresh') {
             log::add('watchdog', 'info', '┌──────────────────────[Refresh de ' . $watchdog->getName() . ']────────────────────────────────────────────────────────────────────────────────────');
             log::add('watchdog', 'info', "└──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────");
             $watchdog->whatchdog_Update();
