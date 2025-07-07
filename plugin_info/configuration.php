@@ -25,6 +25,7 @@ if (!isConnect()) {
 
 <form class="form-horizontal">
 
+    <legend><i class="icon kiko-check-line" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Résultat Global}}</span></legend>
     <div class=" form-group">
         <label class="col-sm-3 control-label">{{Contrôle OK lorsque le Résultat Global est égal à }}</label>
         <div class="col-sm-3">
@@ -34,6 +35,8 @@ if (!isConnect()) {
             </select>
         </div>
     </div> <br>
+
+    <legend><i class="icon kiko-book-open" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Reporting}}</span></legend>
     <div class=" form-group">
         <label class="col-sm-3 control-label">{{Virtuel pour le reporting}}</label>
         <div class="col-sm-3">
