@@ -18,17 +18,35 @@
 
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
-// géré maintenant par la fonction cron de la classe
 function watchdog_install() {
-	$cron = cron::byClassAndFunction('watchdog', 'update');
-	if (is_object($cron)) {
-		$cron->remove();
-	} 
+    	$cron = cron::byClassAndFunction('watchdog', 'update');
+	if (!is_object($cron)) {
+		$cron = new cron();
+		$cron->setClass('watchdog');
+		$cron->setFunction('update');
+		$cron->setEnable(1);
+		$cron->setDeamon(0);
+		$cron->setSchedule('* * * * *');
+		$cron->setTimeout(30);
+		$cron->save();
+	}
 }
 
 function watchdog_update() {
-
+    	$cron = cron::byClassAndFunction('watchdog', 'update');
+	if (!is_object($cron)) {
+		$cron = new cron();
+	}
+	$cron->setClass('watchdog');
+	$cron->setFunction('update');
+	$cron->setEnable(1);
+	$cron->setDeamon(0);
+	$cron->setSchedule('* * * * *');
+	$cron->setTimeout(30);
+	$cron->save();
+	$cron->stop();
 }
+
 
 function watchdog_remove() {
    	$cron = cron::byClassAndFunction('watchdog', 'update');
