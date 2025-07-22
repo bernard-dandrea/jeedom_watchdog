@@ -55,9 +55,8 @@ $eqLogics = eqLogic::byType($plugin->getId());
 			<a class="btn btn-default eqLogicAction " style="margin-right:5px" data-action="configure" title="{{Configuration avancée du Watchdog}}"><i class="fas fa-cogs"></i> </a>
 			<a class="btn btn-warning eqLogicAction " style="margin-right:5px" data-action="copy" title="{{Dupliquer cet équipement}}"><i class="fas fa-copy"></i> </a>
 			<a class="btn btn-danger eqLogicAction " style="margin-right:5px" data-action="remove" title="{{Supprimer le Watchdog}}"><i class="fas fa-minus-circle"></i> </a>
-			<a class="btn btn-success eqLogicAction " style="margin-right:5px" data-action="save" title="{{Sauver et Contrôler}}"><i class="fas fa-check-circle"></i> {{Sauver / Contrôler}}</a>
+			<a class="btn btn-success eqLogicAction " style="margin-right:5px" data-action="save" title="{{Attention, lors de la sauvegarde, seuls les contrôles sont effectués, le résultat global n'est pas calculé et reste inchangé. Il sera mis à jour lors du lancement du prochain contrôle par le CRON ou la commande refresh.}}"><i class="fas fa-check-circle"></i> {{Sauver / Contrôler}}</a>
 		</div>
-
 
 		<!-- Liste des onglets -->
 		<ul class="nav nav-tabs" role="tablist">
@@ -124,7 +123,9 @@ $eqLogics = eqLogic::byType($plugin->getId());
 						<br>
 
 						<div class="form-group">
-							<label class="col-xs-3 control-label">{{Auto-actualisation (cron)}}</label>
+							<label class="col-xs-3 control-label">{{Auto-actualisation (cron)}}
+								<sup><i class="fas fa-question-circle tooltips" title="{{Fréquence de mise à jour du watchdog}}"></i></sup>
+							</label>
 							<div class="col-xs-2">
 								<div class="input-group">
 									<input type="text" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="autorefresh" placeholder="{{Auto-actualisation (cron)}}" />
@@ -166,10 +167,10 @@ $eqLogics = eqLogic::byType($plugin->getId());
 
 						<div class="alert-info bg-success">
 							Il existe trois modes de fonctionnement : <br>
-							* Actions sur chaque contrôle indépendamment : Ce mode teste indépendamment chaque contrôle et déclenche les actions suivant le mode de fonctionnement des actions (paramètre suivant). Dans cette configuration, le Résultat Global n'est pas géré.<br>
-							* Méthode OU : Ce mode teste le résultat global des contrôles en appliquant un test "OU" entre chaque contrôle (le résultat global est vrai si au moins un des controles est vrai). A la fin des contrôles, les actions sont lancées suivant le mode de fonctionnement des actions (paramètre suivant).<br>
-							* Méthode ET : Ce mode teste le résultat global des contrôles en appliquant un test "ET" entre chaque contrôle  (le résultat global est vrai si tous les controles sont vrais).  A la fin des contrôles, les actions sont lancées suivant le mode de fonctionnement des actions (paramètre suivant).</div>
-
+							<br>* Actions sur chaque contrôle indépendamment : Ce mode teste indépendamment chaque contrôle et déclenche les actions suivant le mode de fonctionnement des actions (voir paramètre suivant). Dans cette configuration, le Résultat Global n'est pas géré.
+							<br>* Méthode OU : Ce mode teste le résultat global des contrôles en appliquant un test "OU" entre chaque contrôle (le résultat global est vrai si au moins un des controles est vrai). A la fin des contrôles, les actions sont lancées suivant le mode de fonctionnement des actions (voir paramètre suivant).
+							<br>* Méthode ET : Ce mode teste le résultat global des contrôles en appliquant un test "ET" entre chaque contrôle (le résultat global est vrai si tous les controles sont vrais). A la fin des contrôles, les actions sont lancées suivant le mode de fonctionnement des actions (voir paramètre suivant).
+						</div>
 						<br><br>
 						<div class="form-group">
 							<label class="col-sm-3 control-label">{{Mode de fonctionnement des actions}}</label>
@@ -179,52 +180,64 @@ $eqLogics = eqLogic::byType($plugin->getId());
 									<option value="ALL">{{Lancer les actions même si le contrôle n'a pas changé de valeur}}</option>
 								</select>
 							</div><br><br>
-
 						</div>
-
-						<legend><i class="icon kiko-check-line" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Résultat Global}}</span></legend>
+						<div class="alert-info bg-success">
+							Il existe deux modes de fonctionnement : <br>
+							<br>* Lancer les actions uniquement si le contrôle changé de valeur : 
+							<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- dans le mode 'Actions sur chaque contrôle indépendamment', les actions correspondant au résultat sont lancées sur chaque condition si celui-ci a changé
+							<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- dans le mode ET/OU, les actions correspondant au résultat global sont lancées si celui-ci a changé
+							<br>* Lancer les actions même si le contrôle n'a pas changé de valeur
+							<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- sur chaque condition dans le mode 'Actions sur chaque contrôle indépendamment' 
+							<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- une fois quand le résultat global a été calculé dans le mode ET/OU
+						</div>
+						<legend><i class="icon kiko-check-line" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Résultat}}</span></legend>
 						<div class=" form-group">
-							<label class="col-sm-3 control-label">{{Le contrôle est OK lors le Résultat Global est égal à}}</label>
+							<label class="col-sm-3 control-label">{{Le contrôle est OK lors le résultat est égal à}}</label>
 							<div class="col-sm-3">
-								<select style="width: 500px;" id="sel_object" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="ResultatGlobalOK">
+								<select style="width: 500px;" id="sel_object" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="ResultatOK">
 									<option value="">{{Valeur par défaut}}</option>
 									<option value="1">{{True}}</option>
 									<option value="0">{{False}}</option>
 								</select>
 							</div>
-						</div> <br>
-						
-						<legend><i class="icon kiko-book-open" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Reporting}}</span></legend>
-						<div class=" form-group">
-							<label class="col-sm-3 control-label">{{Virtuel pour le reporting}}</label>
-							<div class="col-sm-3">
-								<div class="input-group">
-									<input style="width: 500px;" title='Laisser vide si valeur par défaut. Mettre / si on ne veut pas reporting même si il y en a un de défini par défaut.' class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="VirtualReport" />
-									<span class="input-group-btn">
-										<a class="btn btn-default cursor" title="Rechercher un équipement" id="VirtualReport"><i class="fas fa-list-alt"></i></a>
-									</span>
-								</div>
-							</div>
-						</div> <br>
-						<div class=" form-group"></div>
-						<label class="col-sm-3 control-label">{{Afficher seulement les watchdogs non OK}}</label>
-						<div class="col-sm-3">
-							<select style="width: 500px;" id="sel_object" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="ReportOnlyNonOK">
-								<option value="">{{Valeur par défaut}}</option>
-								<option value="1">{{Oui}}</option>
-								<option value="0">{{Non}}</option>
-							</select>
-						</div> <br>
+						</div>
 
+						<div class=" form-group">
+							<label class="col-sm-3 control-label">{{Historique}}</label>
+							<div class="col-sm-3">
+								<select style="width: 150px;" id="sel_ResultatHistory" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="ResultatHistory">
+									<option value="">{{Aucun}}</option>
+									<option value="/">{{Défaut}}</option>
+									<option value="-1 day">{{1 jour}}</option>
+									<option value="-7 days">{{7 jours}}</option>
+									<option value="-1 month">{{1 mois}}</option>
+									<option value="-3 month">{{3 mois}}</option>
+									<option value="-6 month">{{6 mois}}</option>
+									<option value="-1 year">{{1 an}}</option>
+									<option value="-2 years">{{2 ans}}</option>
+									<option value="-3 years">{{3 ans}}</option>
+									<option value="never">{{Pas de purge}}</option>
+								</select>
+							</div>
+						</div>
+						<div class=" form-group">
+							<label class="col-sm-3 control-label">{{Afficher seulement les résultats non OK}}</label>
+							<div class="col-sm-3">
+								<select style="width: 500px;" id="sel_DisplayOnlyConditionNonOK" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="DisplayOnlyConditionNonOK">
+									<option value="">{{Valeur par défaut}}</option>
+									<option value="1">{{Oui}}</option>
+									<option value="0">{{Non}}</option>
+								</select>
+							</div>
+						</div>
 						<?php
 						$widgetDashboard = cmd::getSelectOptionsByTypeAndSubtype('info', 'binary', 'dashboard', cmd::availableWidget('dashboard'));
 						$widgetMobile = cmd::getSelectOptionsByTypeAndSubtype('info', 'binary', 'dashboard', cmd::availableWidget('mobile'));
 						?>
-						<br><br>
 						<div class=" form-group">
-							<label class="col-sm-3 control-label">{{Widget Résultat Global dashboard}}</label>
+							<label class="col-sm-3 control-label">{{Widget dashboard}}</label>
 							<div class="col-sm-3">
-								<select style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_resultatglobal_dashboard">
+								<select style="width: 500px;" id="template_resultat_dashboard" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_resultat_dashboard">
 									<option value="">{{Valeur par défaut}}</option>
 									<?php
 									echo $widgetDashboard;
@@ -232,12 +245,10 @@ $eqLogics = eqLogic::byType($plugin->getId());
 								</select>
 							</div>
 						</div>
-						<br>
-
 						<div class=" form-group">
-							<label class="col-sm-3 control-label">{{Widget Résultat Global mobile}}</label>
+							<label class="col-sm-3 control-label">{{Widget mobile}}</label>
 							<div class="col-sm-3">
-								<select style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_resultatglobal_mobile">
+								<select style="width: 500px;" id="template_resultat_mobile" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_resultat_mobile">
 									<option value="">{{Valeur par défaut}}</option>
 									<?php
 									echo $widgetMobile;
@@ -246,9 +257,50 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							</div>
 						</div>
 						<br>
-
+						<legend><i class="icon kiko-book-open" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Reporting}}</span></legend>
 						<div class=" form-group">
-							<label class="col-sm-3 control-label">{{Widget Reporting dashboard}}</label>
+							<label class="col-sm-3 control-label">{{Virtuel pour le reporting}}
+								<sup><i class="fas fa-question-circle tooltips" title="{{Les résultats des contrôles seront enregistrés dans ce virtuel, ce qui permet d'avoir une vue globale de l'état des watchdogs.}}"></i></sup>
+							</label>
+							<div class="col-sm-3">
+								<div class="input-group">
+									<input style="width: 500px;" title='Laisser vide si valeur par défaut. Mettre / si on ne veut pas reporting même si il y en a un de défini par défaut.' class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="VirtualReport" />
+									<span class="input-group-btn">
+										<a class="btn btn-default cursor" title="Rechercher un virtuel" id="VirtualReport"><i class="fas fa-list-alt"></i></a>
+									</span>
+								</div>
+							</div>
+						</div>
+						<div class=" form-group">
+							<label class="col-sm-3 control-label">{{Afficher seulement les watchdogs non OK}}</label>
+							<div class="col-sm-3">
+								<select style="width: 500px;" id="sel_DisplayOnlyReportingNonOK" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="DisplayOnlyReportingNonOK">
+									<option value="">{{Valeur par défaut}}</option>
+									<option value="1">{{Oui}}</option>
+									<option value="0">{{Non}}</option>
+								</select>
+							</div>
+						</div>
+						<div class=" form-group">
+							<label class="col-sm-3 control-label">{{Historique}}</label>
+							<div class="col-sm-3">
+								<select style="width: 150px;" id="sel_ReportingHistory" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="ReportingHistory">
+									<option value="">{{Aucun}}</option>
+									<option value="/">{{Défaut}}</option>
+									<option value="-1 day">{{1 jour}}</option>
+									<option value="-7 days">{{7 jours}}</option>
+									<option value="-1 month">{{1 mois}}</option>
+									<option value="-3 month">{{3 mois}}</option>
+									<option value="-6 month">{{6 mois}}</option>
+									<option value="-1 year">{{1 an}}</option>
+									<option value="-2 years">{{2 ans}}</option>
+									<option value="-3 years">{{3 ans}}</option>
+									<option value="never">{{Pas de purge}}</option>
+								</select>
+							</div>
+						</div>
+						<div class=" form-group">
+							<label class="col-sm-3 control-label">{{Widget dashboard}}</label>
 							<div class="col-sm-3">
 								<select style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_reporting_dashboard">
 									<option value="">{{Valeur par défaut}}</option>
@@ -258,10 +310,8 @@ $eqLogics = eqLogic::byType($plugin->getId());
 								</select>
 							</div>
 						</div>
-						<br>
-
 						<div class=" form-group">
-							<label class="col-sm-3 control-label">{{Widget Reporting mobile}}</label>
+							<label class="col-sm-3 control-label">{{Widget mobile}}</label>
 							<div class="col-sm-3">
 								<select style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_reporting_mobile">
 									<option value="">{{Valeur par défaut}}</option>
@@ -271,7 +321,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 								</select>
 							</div>
 						</div>
-						<br>
+
 					</fieldset>
 				</form>
 			</div>
@@ -358,10 +408,10 @@ $eqLogics = eqLogic::byType($plugin->getId());
 				</table><br>
 
 				<div class="alert-info bg-success">
-					Les variables équipements peuvent être utilisées pour faire des tests dans un contrôle. Par exemple, mettre #equip1# pour récupérer l'équipement 1 dans la formule du contrôle.<br><br>
-					Exemple de formule: <br><br>
-					* tester la dernière communication d'un équipement 1 --> (#timestamp# - strtotime(lastCommunication(#equip1#))) > #tempo1#<br>
-					* tester le résultat d'une commande de l'équipement 2 --> value(#equip2#[Statut]) == 1
+					Les variables équipements peuvent être utilisées pour faire des tests dans un contrôle. Par exemple, mettre _equip1_ pour récupérer l'équipement 1 dans la formule du contrôle.<br><br>
+					Exemple de formule:
+					<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* tester la dernière communication d'un équipement 1 --> (#timestamp# - strtotime(lastCommunication(_equip1_))) > #tempo1#
+					<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* tester le résultat d'une commande de l'équipement 2 --> value(_equip2_[Statut]) == 1
 
 					<br>
 				</div>
@@ -374,12 +424,11 @@ $eqLogics = eqLogic::byType($plugin->getId());
 
 				<br><br>
 				<div class="alert-info bg-success">
-					<b>Vous pouvez #title# pour récupérer le nom du watchdog ou #controlname# (uniquement dans la configuration 'Actions sur chaque contrôle indépendemment')
-						<br><br>Vous pouvez également utiliser les variables #equipX# et #tempoX# dans les paramètres des commandes <br>
-						<br>Exemple: envoi d'un mail avec la date de dernière communication
-						<br>
-						* Titre--> Communication perdue avec #title#
-						<br>* Message --> Dernière communication avec #equip1# : value(#equip1#[Dernière communication])
+					Vous pouvez utiliser #title# pour récupérer le nom du watchdog ou #controlname# pour récupérer le nom du contrôle (uniquement dans la configuration 'Actions sur chaque contrôle indépendamment')
+					<br><br>Vous pouvez également utiliser les variables #equipX# et #tempoX# dans les commandes et leurs paramètres<br>
+					<br>Exemple: envoi d'un mail avec la date de dernière communication
+					<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Titre--> Communication perdue avec #title#
+					<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Message --> Dernière communication avec _equip1_ : value(_equip1_[Dernière communication])
 				</div>
 
 			</div>
