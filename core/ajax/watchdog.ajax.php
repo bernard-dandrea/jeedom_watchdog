@@ -26,22 +26,34 @@ try {
 		if (!is_object($watchdog)) {
 			throw new Exception(__('Equipement watchdog introuvable : ', __FILE__) . init('id'));
 		}
+
+		// en mode action sur tous les contrôles, on va récupérer les paramètres sur la première condition
+		$controlname = '';
+		$equip = '';
+		if ($watchdog->getConfiguration('typeControl', '') == '') {
+			foreach ($watchdog->getCmd() as $condition) {
+				$controlname = $condition->getName();
+				$equip = $condition->getConfiguration("equip", "");
+				break;
+			}
+		}
+
+
 		$comptageid = 0;  // sert à se positionner sur la bonne action 
 		foreach ($watchdog->getConfiguration('watchdogAction') as $cmd) {
-			if (init('id_action') == $comptageid) {
+			if (init('id_action') == $comptageid) {  // on se positionne sur la bonne commande
 				$optionsCommandeaTester = $cmd['options'];
-
-				if (count($watchdog->getCmd()) == 1) { // S'il n'y a qu'une commande, on va remplacer #controlname# par la valeur, sinon on laisse #controlname#
-					foreach ($watchdog->getCmd() as $eqCmd) {
-						foreach ($optionsCommandeaTester as $key => $option) {
-							$optionsCommandeaTester[$key] = str_replace("#controlname#", $eqCmd->getName(), $option);
-						}
-					}
-				}
 				foreach ($optionsCommandeaTester as $key => $option) {
-					$optionsCommandeaTester[$key] = $watchdog->remplace_parametres($option, $key);
+					if ($controlname <> '')
+						$option = str_replace("#controlname#", $controlname, $option);
+					if ($equip <> '')
+						$option  = str_replace("_equip_", $equip, $option);
+					$optionsCommandeaTester[$key] = $watchdog->remplace_parametres($option, $key);  // remplace les parametres dans les options de la commande
 				}
-				$commandeaTester = $watchdog->remplace_parametres($cmd['cmd']);   // remplace les paramètres dans la commande
+				$commandeaTester = $cmd['cmd'];
+				if ($equip <> '')
+					$commandeaTester  = str_replace("_equip_", $equip, $commandeaTester);
+				$commandeaTester = $watchdog->remplace_parametres($commandeaTester);   // remplace les paramètres dans la commande
 
 				log::add('watchdog', 'debug', '**************************************************************************************************************************');
 				log::add('watchdog', 'debug', '** Exécution de la commande ' . jeedom::toHumanReadable($commandeaTester) . " avec comme option(s) : " . json_encode($optionsCommandeaTester));
