@@ -55,7 +55,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 			<a class="btn btn-default eqLogicAction " style="margin-right:5px" data-action="configure" title="{{Configuration avancée du Watchdog}}"><i class="fas fa-cogs"></i> </a>
 			<a class="btn btn-warning eqLogicAction " style="margin-right:5px" data-action="copy" title="{{Dupliquer cet équipement}}"><i class="fas fa-copy"></i> </a>
 			<a class="btn btn-danger eqLogicAction " style="margin-right:5px" data-action="remove" title="{{Supprimer le Watchdog}}"><i class="fas fa-minus-circle"></i> </a>
-			<a class="btn btn-success eqLogicAction " style="margin-right:5px" data-action="save" title="{{Attention, lors de la sauvegarde, seuls les contrôles sont effectués, le résultat global n'est pas calculé et reste inchangé. Il sera mis à jour lors du lancement du prochain contrôle par le CRON ou la commande refresh.}}"><i class="fas fa-check-circle"></i> {{Sauver / Contrôler}}</a>
+			<a class="btn btn-success eqLogicAction " style="margin-right:5px" data-action="save" title="{{Attention, lors de la sauvegarde, seuls les contrôles sont effectués, le résultat global n'est pas calculé et reste inchangé. Il sera mis à jour lors du lancement du prochain contrôle par le CRON ou la commande refresh. Les actions ne sont pas lancées non plus.}}"><i class="fas fa-check-circle"></i> {{Sauver / Contrôler}}</a>
 		</div>
 
 		<!-- Liste des onglets -->
@@ -84,7 +84,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							<label class="col-sm-3 control-label">{{Objet parent}}</label>
 							<div class="col-sm-3">
 								<select id="sel_object" class="eqLogicAttr form-control" data-l1key="object_id">
-									<option value="">{{Aucun}}</option>
+									<option value="">{{Aucun}}</option>eqLogic
 									<?php
 									foreach ((jeeObject::buildTree(null, false)) as $object) {
 										echo '<option value="' . $object->getId() . '">' . str_repeat('&nbsp;&nbsp;', $object->getConfiguration('parentNumber')) . $object->getName() . '</option>';
@@ -115,8 +115,16 @@ $eqLogics = eqLogic::byType($plugin->getId());
 						</div>
 						<br>
 						<div class="form-group">
-							<label class="col-sm-3 control-label">Log spécifique pour ce watchdog</label>
-							<div class="col-sm-9">
+							<label class="col-sm-3 control-label">{{Log spécifique pour ce watchdog}}
+								<sup><i class="fas fa-question-circle tooltips" title="{{Si cette option est activée, les traces de ce watchdog seront enregistrées dans watchdog_}}
+										<?php
+										if (isset($eqLogic) && is_object($eqLogic) && $eqLogic instanceof eqLogic) {
+											echo  $eqLogic->getId();
+										}
+										?>
+										"></i></sup>
+							</label>
+							<div class="col-sm-3">
 								<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="logspecifique">{{Activé}}</label>
 							</div>
 						</div>
@@ -154,10 +162,11 @@ $eqLogics = eqLogic::byType($plugin->getId());
 						<br>
 						<legend><i class="fa fa-list-alt" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Mode de fonctionnement}}</span></legend>
 
+
 						<div class="form-group">
 							<label class="col-sm-3 control-label">{{Mode de fonctionnement des contrôles}}</label>
 							<div class="col-sm-3">
-								<select style="width: 500px;" id="sel_object" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="typeControl">
+								<select name="typecontrole" style="width: 500px;" id="sel_object" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="typeControl">
 									<option value="">{{Actions sur chaque contrôle indépendamment (par défaut)}}</option>
 									<option value="OU">{{Actions sur l'ensemble des contrôles (avec méthode OU)}}</option>
 									<option value="ET">{{Actions sur l'ensemble des contrôles (avec méthode ET)}}</option>
@@ -183,12 +192,12 @@ $eqLogics = eqLogic::byType($plugin->getId());
 						</div>
 						<div class="alert-info bg-success">
 							Il existe deux modes de fonctionnement : <br>
-							<br>* Lancer les actions uniquement si le contrôle changé de valeur : 
-							<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- dans le mode 'Actions sur chaque contrôle indépendamment', les actions correspondant au résultat sont lancées sur chaque condition si celui-ci a changé
-							<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- dans le mode ET/OU, les actions correspondant au résultat global sont lancées si celui-ci a changé
+							<br>* Lancer les actions uniquement si le contrôle changé de valeur :
+							<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- dans le mode 'Actions sur chaque contrôle indépendamment', les actions correspondant au résultat sont lancées sur chaque condition si celui-ci a changé.
+							<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- dans le mode ET/OU, les actions correspondant au résultat global sont lancées si celui-ci a changé.
 							<br>* Lancer les actions même si le contrôle n'a pas changé de valeur
-							<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- sur chaque condition dans le mode 'Actions sur chaque contrôle indépendamment' 
-							<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- une fois quand le résultat global a été calculé dans le mode ET/OU
+							<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- dans le mode 'Actions sur chaque contrôle indépendamment' , les actions sont lancées sur chaque condition.
+							<br> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- dans le mode ET/OU, les ctions sont lancées une fois quand le résultat global a été calculé .
 						</div>
 						<legend><i class="icon kiko-check-line" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Résultat}}</span></legend>
 						<div class=" form-group">
@@ -235,7 +244,9 @@ $eqLogics = eqLogic::byType($plugin->getId());
 						$widgetMobile = cmd::getSelectOptionsByTypeAndSubtype('info', 'binary', 'dashboard', cmd::availableWidget('mobile'));
 						?>
 						<div class=" form-group">
-							<label class="col-sm-3 control-label">{{Widget dashboard}}</label>
+							<label class="col-sm-3 control-label">{{Widget dashboard}}
+								<sup><i class="fas fa-question-circle tooltips" title="{{Widget appliqué sur le(s) résultat(s) dans la tuile du watchdog en mode dashboard}}"></i></sup>
+							</label>
 							<div class="col-sm-3">
 								<select style="width: 500px;" id="template_resultat_dashboard" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_resultat_dashboard">
 									<option value="">{{Valeur par défaut}}</option>
@@ -246,7 +257,8 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							</div>
 						</div>
 						<div class=" form-group">
-							<label class="col-sm-3 control-label">{{Widget mobile}}</label>
+							<label class="col-sm-3 control-label">{{Widget mobile}}
+								<sup><i class="fas fa-question-circle tooltips" title="{{Widget appliqué sur le(s) résultat(s) dans la tuile du watchdog en mode mobile}}"></i></sup></label>
 							<div class="col-sm-3">
 								<select style="width: 500px;" id="template_resultat_mobile" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_resultat_mobile">
 									<option value="">{{Valeur par défaut}}</option>
@@ -272,7 +284,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							</div>
 						</div>
 						<div class=" form-group">
-							<label class="col-sm-3 control-label">{{Afficher seulement les watchdogs non OK}}</label>
+							<label class="col-sm-3 control-label">{{Afficher seulement les résultats non OK}}</label>
 							<div class="col-sm-3">
 								<select style="width: 500px;" id="sel_DisplayOnlyReportingNonOK" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="DisplayOnlyReportingNonOK">
 									<option value="">{{Valeur par défaut}}</option>
@@ -300,7 +312,9 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							</div>
 						</div>
 						<div class=" form-group">
-							<label class="col-sm-3 control-label">{{Widget dashboard}}</label>
+							<label class="col-sm-3 control-label">{{Widget dashboard}}
+								<sup><i class="fas fa-question-circle tooltips" title="{{Widget appliqué sur le(s) résultat(s) dans la tuile du virtuel en mode dashboard}}"></i></sup>
+							</label>
 							<div class="col-sm-3">
 								<select style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_reporting_dashboard">
 									<option value="">{{Valeur par défaut}}</option>
@@ -311,7 +325,9 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							</div>
 						</div>
 						<div class=" form-group">
-							<label class="col-sm-3 control-label">{{Widget mobile}}</label>
+							<label class="col-sm-3 control-label">{{Widget mobile}}
+								<sup><i class="fas fa-question-circle tooltips" title="{{Widget appliqué sur le(s) résultat(s) dans la tuile du virtuel en mode mobile}}"></i></sup>
+							</label>
 							<div class="col-sm-3">
 								<select style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="template_reporting_mobile">
 									<option value="">{{Valeur par défaut}}</option>
@@ -337,12 +353,66 @@ $eqLogics = eqLogic::byType($plugin->getId());
 				<a id="afficheCalculs" class="btn btn-info btn-sm bt_afficheCalculs pull-right" data-type="action" style="margin-top:-15px;"><i class="fas fa-square-root-alt"></i> {{Afficher les calculs}}</a><a id="masqueCalculs" class="btn btn-warning btn-sm bt_masqueCalculs pull-right" data-type="action" style="margin-top:5px;"><i class="fas fa-square-root-alt"></i> {{Masquer les calculs}}</a>
 				<br>
 
-				<!-- ICI la partie qui affiche le résultat global dans le cas d'un mode OU ou d'un ET-->
+				<div class="alert-info bg-success">
+					Vous pouvez entrer dans la zone contrôle n'importe quelle expression reconnue dans les scénarios. Cette expression doit renvoyer True (=1) ou False (=0). Vous pouvez tester l'expression dans le Testeur d'expressions (menu Outils). Les expressions incorrectes sont ignorées lors de l'exécution du watchdog en mode programmé ou via la commande Refresh.
+					<br>
+				</div>
+				<!-- ICI la partie qui affiche le résultat global dans le cas d'un mode ET/OU-->
 				<div id="section_resultatGlobal">
 				</div>
 
 				<legend><i class="icon jeedomapp-settings" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Variables}}</span></legend>
+				<br>
+				<table border="0">
+					<tbody>
+						<tr>
+							<td style="text-align: right; width: 100px;"><b>Expression</b></td>
+							<td>
+								<div class="input-group">
+									<input style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="expr" />
+								</div>
+							</td>
+						</tr>
 
+					</tbody>
+				</table><br>
+				<div class="alert-info bg-success">
+					L'expression peut être utilisée pour éviter de répéter les .................<br><br>
+					<br>
+				</div>
+								<br>
+				<table border="0">
+					<tbody>
+						<tr>
+							<td style="text-align: right; width: 100px;"><b>var1</b></td>
+							<td>
+								<div class="input-group">
+									<input style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="var1" />
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 100px;"><b>var2</b></td>
+							<td>
+								<div class="input-group">
+									<input style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="var2" />
+								</div>
+							</td>
+						</tr>
+						<tr>
+							<td style="text-align: right; width: 100px;"><b>var3</b></td>
+							<td>
+								<div class="input-group">
+									<input style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="var3" />
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table><br>
+				<div class="alert-info bg-success">
+					Les variables peuvent être utilisées pour faire des tests dans un contrôle. Par exemple, mettre _var1_ pour récupérer la variable 1 dans la formule du contrôle.<br><br>
+					<br>
+				</div>
 				<table border="0">
 					<tbody>
 						<tr>
@@ -375,7 +445,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							<td style="text-align: right; width: 100px;"><b>Equipement 1</b></td>
 							<td>
 								<div class="input-group">
-									<input style="width: 300px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="equip1" />
+									<input style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="equip1" />
 									<span class="input-group-btn">
 										<a class="btn btn-default cursor" title="Rechercher un équipement" id="equip1"><i class="fas fa-list-alt"></i></a>
 									</span>
@@ -386,7 +456,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							<td style="text-align: right; width: 100px;"><b>Equipement 2</b></td>
 							<td>
 								<div class="input-group">
-									<input style="width: 300px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="equip2" />
+									<input style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="equip2" />
 									<span class="input-group-btn">
 										<a class="btn btn-default cursor" title="Rechercher un équipement" id="equip2"><i class="fas fa-list-alt"></i></a>
 									</span>
@@ -397,7 +467,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							<td style="text-align: right; width: 100px;"><b>Equipement 3</b></td>
 							<td>
 								<div class="input-group">
-									<input style="width: 300px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="equip3" />
+									<input style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="equip3" />
 									<span class="input-group-btn">
 										<a class="btn btn-default cursor" title="Rechercher un équipement" id="equip3"><i class="fas fa-list-alt"></i></a>
 									</span>
@@ -424,11 +494,15 @@ $eqLogics = eqLogic::byType($plugin->getId());
 
 				<br><br>
 				<div class="alert-info bg-success">
-					Vous pouvez utiliser #title# pour récupérer le nom du watchdog ou #controlname# pour récupérer le nom du contrôle (uniquement dans la configuration 'Actions sur chaque contrôle indépendamment')
-					<br><br>Vous pouvez également utiliser les variables #equipX# et #tempoX# dans les commandes et leurs paramètres<br>
-					<br>Exemple: envoi d'un mail avec la date de dernière communication
+					Vous pouvez utiliser #title# pour récupérer le nom du watchdog.
+					<br><br>Vous pouvez également utiliser les variables _equipX_ et #tempoX# dans les commandes et leurs paramètres<br>
+					<br><br>Exemple: envoi d'un mail avec la date de dernière communication
 					<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Titre--> Communication perdue avec #title#
 					<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Message --> Dernière communication avec _equip1_ : value(_equip1_[Dernière communication])
+					<br><br> Dans la configuration 'Actions sur chaque contrôle indépendamment', vous pouvez utiliser #controlname# pour récupérer le nom du contrôle et _equip_ pour récupérer le premier équipement référencé dans le contrôle (soit directement, soit via une commande)
+					<br><br>Exemple: envoi d'un mail avec la date de dernière communication
+					<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Titre--> Communication perdue avec #controlname#
+					<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Message --> Dernière communication avec _equip_ : value(_equip_[Dernière communication])
 				</div>
 
 			</div>
