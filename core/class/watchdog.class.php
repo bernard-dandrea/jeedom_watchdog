@@ -504,18 +504,16 @@ class watchdog extends eqLogic
         // remplace l expression
         $expr = $watchdog->getConfiguration('expr', '');
         if ($expr != '') {
-            if (stripos(' ' . $_string, '_test_(') = 1) {
-                $parsedCommand1 = parseFunctionCall(trim($_string));
-                if ($parsedCommand1) {
-                    $_string = $expr;
-                    $i = 0;
-                    foreach ($parsedCommand1['arguments'] as $arg) {
-                        $_string = str_ireplace("_arg" . (string)$i . "_", trim($arg), $_string);
-                        $i++;
-                        if ($i == 2) break;
-                    }
-                    $_string = str_ireplace("_expr_(" . "", trim($arg), $_string);
+            $parsedCommand1 = parseFunctionCall(trim($_string));
+            if ($parsedCommand1) {
+                $_string = $expr;
+                $i = 0;
+                foreach ($parsedCommand1['arguments'] as $arg) {
+                    $_string = str_ireplace("_arg" . (string)$i . "_", trim($arg), $_string);
+                    $i++;
+                    if ($i == 2) break;
                 }
+                $_string = str_ireplace("_expr_(" . "", trim($arg), $_string);
             }
         }
 
@@ -615,10 +613,9 @@ class watchdogCmd extends cmd
         $resultat = $condition->TesteCondition($_string);
         $watchdog->log('debug', '║ │ ╚═══> Resultat : ' . $resultat);
 
-        // sauve le resultat pour affichage dans le widget et historique
-        $watchdog->checkAndUpdateCmd($condition, $resultat);
-
         // sauve le resultat dans la condition
+        // $watchdog->checkAndUpdateCmd($condition, $resultat);
+
         // Si le résultat a changé, il faut actualiser le calcul du résultat global, pour cela, on utilise la variable cmd.configuration.aChange qui traitera le calcul dans postSave
         if ($resultatPrecedent  != $resultat) {
             $aChange = True;
@@ -626,6 +623,7 @@ class watchdogCmd extends cmd
         } else {
             $aChange = False;
         }
+
         $condition->setConfiguration('aChange', $aChange);
 
         if ($watchdog->getConfiguration('typeControl') == '') {
@@ -736,6 +734,7 @@ class watchdogCmd extends cmd
         $toHumanReadable = jeedom::toHumanReadable($_string);
         // $watchdog->log('debug', '║ │ ║ ╚═╦═>   ' . $fromHumanReadable);
         $watchdog->log('debug', '║ │ ╦═>   ' . $toHumanReadable);
+
 
         $condition->setConfiguration('calcul', scenarioExpression::setTags($fromHumanReadable));  // stocke les valeurs du calcul
 
