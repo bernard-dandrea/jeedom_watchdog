@@ -18,8 +18,9 @@
 
 require_once dirname(__FILE__) . '/../../../core/php/core.inc.php';
 
-function watchdog_install() {
-    	$cron = cron::byClassAndFunction('watchdog', 'update');
+function watchdog_install()
+{
+	$cron = cron::byClassAndFunction('watchdog', 'update');
 	if (!is_object($cron)) {
 		$cron = new cron();
 		$cron->setClass('watchdog');
@@ -30,10 +31,15 @@ function watchdog_install() {
 		$cron->setTimeout(30);
 		$cron->save();
 	}
+	$_key = 'log::level::watchdog_actions';
+	$loglevel =  array("100" => "1", "200" => "0", "300" => "0", "400" => "0", "1000" => "0", "default" => "0"); // niveau debug pour afficher tous les niveaux de messages
+	config::save($_key, $loglevel);
+	
 }
 
-function watchdog_update() {
-    	$cron = cron::byClassAndFunction('watchdog', 'update');
+function watchdog_update()
+{
+	$cron = cron::byClassAndFunction('watchdog', 'update');
 	if (!is_object($cron)) {
 		$cron = new cron();
 	}
@@ -48,11 +54,14 @@ function watchdog_update() {
 }
 
 
-function watchdog_remove() {
-   	$cron = cron::byClassAndFunction('watchdog', 'update');
+function watchdog_remove()
+{
+	$cron = cron::byClassAndFunction('watchdog', 'update');
 	if (is_object($cron)) {
 		$cron->remove();
-	} 
-}
+	}
 
-?>
+	$_key = 'log::level::watchdog_actions';
+	if (config::byKey($_key) != '')
+		config::remove($_key);
+}
