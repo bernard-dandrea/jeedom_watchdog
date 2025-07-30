@@ -70,7 +70,9 @@ if (!isConnect()) {
     ?>
 
     <div class=" form-group">
-        <label class="col-sm-3 control-label">{{Widget dashboard}}</label>
+        <label class="col-sm-3 control-label">{{Widget dashboard}}
+            <sup><i class="fas fa-question-circle tooltips" title="{{Widget appliqué sur le(s) résultat(s) dans la tuile du watchdog en mode dashboard}}"></i></sup>
+        </label>
         <div class="col-sm-3">
             <select style="width: 150px;" id="template_resultat_dashboard" class="configKey form-control" data-l1key="template_resultat_dashboard">
                 <option value="">{{Défaut}}</option>
@@ -81,7 +83,9 @@ if (!isConnect()) {
         </div>
     </div>
     <div class=" form-group">
-        <label class="col-sm-3 control-label">{{Widget mobile}}</label>
+        <label class="col-sm-3 control-label">{{Widget mobile}}
+            <sup><i class="fas fa-question-circle tooltips" title="{{Widget appliqué sur le(s) résultat(s) dans la tuile du watchdog en mode mobile}}"></i></sup>
+        </label>
         <div class="col-sm-3">
             <select style="width: 150px;" id="template_resultat_mobile" class="configKey form-control" data-l1key="template_resultat_mobile">
                 <option value="">{{Défaut}}</option>
@@ -126,7 +130,7 @@ if (!isConnect()) {
         </div>
     </div>
     <div class=" form-group">
-        <label class="col-sm-3 control-label">{{Afficher seulement les watchdogs non OK}}</label>
+        <label class="col-sm-3 control-label">{{Afficher seulement les résultats non OK}}</label>
         <div class="col-sm-3">
             <select style="width: 150px;" id="sel_DisplayOnlyReportingNonOK" class="configKey form-control" data-l1key="DisplayOnlyReportingNonOK">
                 <option value="">{{Oui}}</option>
@@ -135,7 +139,9 @@ if (!isConnect()) {
         </div>
     </div>
     <div class=" form-group">
-        <label class="col-sm-3 control-label">{{Widget dashboard}}</label>
+        <label class="col-sm-3 control-label">{{Widget dashboard}}
+            <sup><i class="fas fa-question-circle tooltips" title="{{Widget appliqué sur le(s) résultat(s) dans la tuile du virtuel en mode dashboard}}"></i></sup>
+        </label>
         <div class="col-sm-3">
             <select style="width: 150px;" id="template_reporting_dashboard" class="configKey form-control" data-l1key="template_reporting_dashboard">
                 <option value="">{{Défaut}}</option>
@@ -146,7 +152,9 @@ if (!isConnect()) {
         </div>
     </div>
     <div class=" form-group">
-        <label class="col-sm-3 control-label">{{Widget mobile}}</label>
+        <label class="col-sm-3 control-label">{{Widget mobile}}
+            <sup><i class="fas fa-question-circle tooltips" title="{{Widget appliqué sur le(s) résultat(s) dans la tuile du virtuel en mode mobile}}"></i></sup>
+        </label>
         <div class="col-sm-3">
             <select style="width: 150px;" id="template_reporting_mobile" class="configKey form-control" data-l1key="template_reporting_mobile">
                 <option value="">{{Défaut}}</option>
@@ -157,6 +165,9 @@ if (!isConnect()) {
         </div>
     </div>
     <br>
+
+
+
 </form>
 
 
