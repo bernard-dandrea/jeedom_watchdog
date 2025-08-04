@@ -4,6 +4,12 @@
 >
 >S'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
 
+**Version 2025-08-04**
+
+Ne pas charger cette version: la demande de mise à jour est due à une erreur lors de la mise à jour du code dans Github (mise à jour de master au lieu de beta)
+
+
+
 **Version 2025-06-10**
 
 *   Reprise de la gestion du plugin par @bernard.dandrea (un grand merci à @sigalou pour le formidable travail effectué sur le plugin)
