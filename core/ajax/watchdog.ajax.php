@@ -17,86 +17,59 @@
  */
 
 try {
-	require_once __DIR__ . '/../../../../core/php/core.inc.php';
-	include_file('core', 'authentification', 'php');
-
-
-	if (init('action') == 'testaction') {
-		$watchdog = watchdog::byId(init('id'));
-		if (!is_object($watchdog)) {
-			throw new Exception(__('Equipement watchdog introuvable : ', __FILE__) . init('id'));
-		}
-
-		// en mode action sur tous les contrôles, on va récupérer les paramètres sur la première condition
-		$controlname = '';
-		$equip = '';
-		if ($watchdog->getConfiguration('typeControl', '') == '') {
-			foreach ($watchdog->getCmd() as $condition) {
-				$controlname = $condition->getName();
-				$equip = $condition->getConfiguration("equip", "");
-				break;
-			}
-		}
-
-
-		$comptageid = 0;  // sert à se positionner sur la bonne action 
-		foreach ($watchdog->getConfiguration('watchdogAction') as $cmd) {
-			if (init('id_action') == $comptageid) {  // on se positionne sur la bonne commande
-				$optionsCommandeaTester = $cmd['options'];
-				foreach ($optionsCommandeaTester as $key => $option) {
-					if ($controlname <> '')
-						$option = str_replace("#controlname#", $controlname, $option);
-					if ($equip <> '')
-						$option  = str_replace("_equip_", $equip, $option);
-					$optionsCommandeaTester[$key] = $watchdog->remplace_parametres($option, $key);  // remplace les parametres dans les options de la commande
-				}
-				$commandeaTester = $cmd['cmd'];
-				if ($equip <> '')
-					$commandeaTester  = str_replace("_equip_", $equip, $commandeaTester);
-				$commandeaTester = $watchdog->remplace_parametres($commandeaTester);   // remplace les paramètres dans la commande
-
-				log::add('watchdog', 'debug', '**************************************************************************************************************************');
-				log::add('watchdog', 'debug', '** Exécution de la commande ' . jeedom::toHumanReadable($commandeaTester) . " avec comme option(s) : " . json_encode($optionsCommandeaTester));
-				log::add('watchdog', 'debug', '**************************************************************************************************************************');
-				scenarioExpression::createAndExec('action', $commandeaTester, $optionsCommandeaTester);
-			}
-			$comptageid++;
-		}
+    require_once __DIR__ . '/../../../../core/php/core.inc.php';
+    include_file('core', 'authentification', 'php');
+/*
+    if (init('action') == 'launchAction') {
+        watchdog::launchCmd(init('id'));
 		ajax::success();
-	}
-
-	if (init('action') == 'cherche_equipement_dans_expression') {
-
-		$condition = init('condition');
-		$id = init('id');
-
-		$watchdogCmd = watchdogCmd::byId($id);
-		$equip = '';
-		if (is_object($watchdogCmd)) {
-			$equip = $watchdogCmd->cherche_equipement_dans_expression($condition);
-		}
-		ajax::success($equip);
-	}
-
-	if (init('action') == 'test_expression') {
-
-		$condition = init('condition');
-		$id = init('id');
-
-		$watchdogCmd = watchdogCmd::byId($id);
-
-		if (is_object($watchdogCmd)) {
-			$watchdog = $watchdogCmd->getEqlogic();  // utile pour récupérer les paramètres généraux du watchdog
-			if (is_object($watchdog)) {
-				$expression = $watchdog->remplace_parametres($condition);
-				$expression = jeedom::toHumanReadable($expression);
+    }
+    if (init('action') == 'getStatus') {
+		log::add('watchdog','debug', ' id ' . init('id'));
+        $watchdog = watchdog::byId(init('id'));
+		$return = $watchdog->getConfiguration('activAction');
+		ajax::success($return);
+    }
+	
+    if (init('action') == 'actionAll') {
+		log::add('watchdog','debug', ' id ' . init('id'));
+        watchdog::actionAll(init('id'));
+		ajax::success();
+    }
+	*/
+    if (init('action') == 'testaction') {
+        $watchdog = watchdog::byId(init('id'));
+		    if (!is_object($watchdog)) {
+			  throw new Exception(__('Equipement watchdog introuvable : ', __FILE__) . init('id'));
 			}
-			ajax::success($expression);
-		}
-	}
-
-	throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
-	/*     * *********Catch exeption*************** */
+		$comptageid=0;
+		foreach ($watchdog->getConfiguration('watchdogAction') as $cmd) {
+					if (init('id_action')== $comptageid) {
+						$commandeaTester=$cmd['cmd'];
+						$optionsCommandeaTester=$cmd['options'];
+						//log::add('watchdog','debug', ' optionsCommandeaTester: '.json_encode($optionsCommandeaTester));
+						
+						if (count($watchdog->getCmd()) == 1) {// S'il n'y en a qu'une commande, on va remplacer #controlname# par la valeur, sinon on laisse #controlname#
+								foreach ($watchdog->getCmd() as $eqCmd) {
+									foreach ($optionsCommandeaTester as $key => $option) {
+										$optionsCommandeaTester[$key]=str_replace("#controlname#", $eqCmd->getName(), $option);
+									}				
+								}
+						}
+						foreach ($optionsCommandeaTester as $key => $option) {
+							$optionsCommandeaTester[$key]=str_replace("#title#", $watchdog->getName(), $option);
+						}
+						scenarioExpression::createAndExec('action', $commandeaTester, $optionsCommandeaTester);		
+					}
+					$comptageid++;
+				}
+		ajax::success();
+    }	
+	
+			
+    throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
+    /*     * *********Catch exeption*************** */
 } catch (Exception $e) {
-	ajax::error(displayExeption($e), $e->getCode());
+    ajax::error(displayExeption($e), $e->getCode());
 }
+?>
