@@ -65,6 +65,35 @@ try {
 		ajax::success();
 	}
 
+	if (init('action') == 'cherche_equipement_dans_expression') {
+
+		$condition = init('condition');
+		$id = init('id');
+
+		$watchdogCmd = watchdogCmd::byId($id);
+		$equip = '';
+		if (is_object($watchdogCmd)) {
+			$equip = $watchdogCmd->cherche_equipement_dans_expression($condition);
+		}
+		ajax::success($equip);
+	}
+
+	if (init('action') == 'test_expression') {
+
+		$condition = init('condition');
+		$id = init('id');
+
+		$watchdogCmd = watchdogCmd::byId($id);
+
+		if (is_object($watchdogCmd)) {
+			$watchdog = $watchdogCmd->getEqlogic();  // utile pour récupérer les paramètres généraux du watchdog
+			if (is_object($watchdog)) {
+				$expression = $watchdog->remplace_parametres($condition);
+				$expression = jeedom::toHumanReadable($expression);
+			}
+			ajax::success($expression);
+		}
+	}
 
 	throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
 	/*     * *********Catch exeption*************** */
