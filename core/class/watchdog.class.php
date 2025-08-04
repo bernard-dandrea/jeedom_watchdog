@@ -502,18 +502,19 @@ class watchdog extends eqLogic
 
 
         // remplace l expression
-        $expr = $watchdog->getConfiguration('expr', '');
-        if ($expr != '') {
-            $parsedCommand1 = parseFunctionCall(trim($_string));
-            if ($parsedCommand1) {
-                $_string = $expr;
-                $i = 0;
-                foreach ($parsedCommand1['arguments'] as $arg) {
-                    $_string = str_ireplace("_arg" . (string)$i . "_", trim($arg), $_string);
-                    $i++;
-                    if ($i == 2) break;
+        $macro = $watchdog->getConfiguration('macro', '');
+        if ($macro != '') {
+            if (stripos(' ' . $_string, '_macro_(') == 1) {
+                $parsedCommand1 = parseFunctionCall(trim($_string));
+                if ($parsedCommand1) {
+                    $_string = $macro;
+                    $i = 0;
+                    foreach ($parsedCommand1['arguments'] as $arg) {
+                        $_string = str_ireplace("_arg" . (string)$i . "_", trim($arg), $_string);
+                        $i++;
+                        if ($i == 2) break;
+                    }
                 }
-                $_string = str_ireplace("_expr_(" . "", trim($arg), $_string);
             }
         }
 
@@ -550,6 +551,12 @@ class watchdog extends eqLogic
                 }
             }
         }
+
+        // remplacement pour les champs exemple :  #_arg0_[Résultat Global]# --> ##[maison][Tous Controles]#[Résultat Global]#  --> #[maison][Tous Controles][Résultat Global]#
+        $_string = jeedom::toHumanReadable($_string);
+        $_string = str_ireplace("##[", "#[", $_string);
+        $_string = str_ireplace("]#[", "][", $_string);
+        $_string = jeedom::fromHumanReadable($_string);
 
         return $_string;
     }
@@ -613,9 +620,10 @@ class watchdogCmd extends cmd
         $resultat = $condition->TesteCondition($_string);
         $watchdog->log('debug', '║ │ ╚═══> Resultat : ' . $resultat);
 
-        // sauve le resultat dans la condition
-        // $watchdog->checkAndUpdateCmd($condition, $resultat);
+        // sauve le resultat pour affichage dans le widget et historique
+        $watchdog->checkAndUpdateCmd($condition, $resultat);
 
+        // sauve le resultat dans la condition
         // Si le résultat a changé, il faut actualiser le calcul du résultat global, pour cela, on utilise la variable cmd.configuration.aChange qui traitera le calcul dans postSave
         if ($resultatPrecedent  != $resultat) {
             $aChange = True;
@@ -623,7 +631,6 @@ class watchdogCmd extends cmd
         } else {
             $aChange = False;
         }
-
         $condition->setConfiguration('aChange', $aChange);
 
         if ($watchdog->getConfiguration('typeControl') == '') {
@@ -735,8 +742,8 @@ class watchdogCmd extends cmd
         // $watchdog->log('debug', '║ │ ║ ╚═╦═>   ' . $fromHumanReadable);
         $watchdog->log('debug', '║ │ ╦═>   ' . $toHumanReadable);
 
-
         $condition->setConfiguration('calcul', scenarioExpression::setTags($fromHumanReadable));  // stocke les valeurs du calcul
+        $condition->setConfiguration('expression', $toHumanReadable);  // stocke l expression développée
 
         $return = evaluate(scenarioExpression::setTags($fromHumanReadable, $scenario, true)); // apparemment, setTags permet de récupérer les valeurs des variables dans la formule
 
@@ -753,9 +760,9 @@ class watchdogCmd extends cmd
 
     // recherche le premier Eqlogic dans la formule
 
-    function cherche_equipement_dans_expression($text)
+    public function cherche_equipement_dans_expression($text)
     {
-
+        $text = jeedom::fromHumanReadable($text);
         // recherche le 1er équipement
         preg_match_all("/#eqLogic([0-9]*)#/", $text, $matches);
         foreach ($matches[1] as $eqLogic_id) {
@@ -782,64 +789,7 @@ class watchdogCmd extends cmd
         // rien trouvé
         return "";
     }
-    /*
-    // Lance les actions de l'équipement
-    public function LanceActionSurChaqueControleIndependamment($resultat)
-    {
 
-        if ($resultat == '0') $resultat = 'False';
-        if ($resultat == '1') $resultat = 'True';
-
-        $condition = $this;
-        $watchdog = $condition->getEqLogic();
-        $typeControl = $watchdog->getConfiguration('typeControl');
-        $watchdogID = $watchdog->getId();
-
-        $watchdog->log('debug', '╠═════> On lance les actions qui correspondent au passage de [' . $condition->getName() . '] à ' . $resultat);
-
-        foreach ($watchdog->getConfiguration("watchdogAction") as $action) {
-
-            $options = [];
-            if (isset($action['options'])) $options = $action['options'];
-
-            $equip = $condition->getConfiguration('equip', ''); // parametre _equip_ lié à la condition
-
-            if (($action['actionType'] == $resultat) && $options['enable'] == '1') {
-
-                // On va remplacer les variables dans tous les champs du array "options"
-                foreach ($options as $key => $option) {
-                    $option = str_ireplace("#controlname#", $condition->getName(), $option);
-                    $option = $watchdog->remplace_parametres($option, $key);  // remplace les parametres utilisés dans les commandes action
-
-                    // remplace _equip_ par le premier équipement référencé dans la condition
-                    if ((stripos(' ' . $option, '_equip_') > 0) && ($equip <> ''))
-                        $option = str_ireplace("_equip_", $equip, $option);
-
-                    $options[$key] = $option;
-                }
-                $commande_action = $watchdog->remplace_parametres($action['cmd']);  // remplace les paramètres dans la commande
-                // remplace _equip_ par le premier équipement référencé dans la condition
-                if ((stripos(' ' . $commande_action, '_equip_') > 0) && ($equip <> ''))
-                    $commande_action = str_ireplace("_equip_", $equip, $commande_action);
-
-                $watchdog->log('debug', '╠══════> Exécution de la commande ' . jeedom::toHumanReadable($commande_action) . " avec comme option(s) : " . json_encode($options));
-                if ($options['log'] == '1') {
-                    log::add('watchdog_actions', 'info', 'Watchdog "' . $watchdog->getHumanName() . '" Condition "' . $condition->getName() . '" Résultat Controle "' . $resultat . '" Commande ' . jeedom::toHumanReadable($commande_action) . " avec comme option(s) : " . json_encode($options));
-                }
-                try {
-                    scenarioExpression::createAndExec('action', $commande_action, $options);
-                } catch (Exception $e) {
-                    $watchdog->log('error', __('function LanceActionSurChaqueControleIndependamment : Erreur lors de l\'éxecution de ', __FILE__) . $commande_action . __('. Détails : ', __FILE__) . $e->getMessage());
-                    if ($options['log'] == '1') {
-                        log::add('watchdog_actions', 'info', 'Watchdog "' . $watchdog->getHumanName() . '" Condition "' . $condition->getName() . '" Commande ' . jeedom::toHumanReadable($commande_action) . '" Erreur lors de l\'éxecution de ' . $commande_action . " : " . $e->getMessage());
-                    }
-                }
-            }
-        }
-
-        $watchdog->log('info', '╚══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════');
-    }
-*/
     public function postSave()
     {
         if ($this->getType() == 'action') return; //On ne fait pas le test si c'est une Commande Action		
