@@ -113,24 +113,17 @@ $eqLogics = eqLogic::byType($plugin->getId());
 								<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked>{{Visible}}</label>
 							</div>
 						</div>
-						<br>
+						
 						<div class="form-group">
 							<label class="col-sm-3 control-label">{{Log spécifique pour ce watchdog}}
-								<sup><i class="fas fa-question-circle tooltips" title="{{Si cette option est activée, les traces de ce watchdog seront enregistrées dans watchdog_}}
-										<?php
-										if (isset($eqLogic) && is_object($eqLogic) && $eqLogic instanceof eqLogic) {
-											echo  $eqLogic->getId();
-										}
-										?>
-										"></i></sup>
-							</label>
+								<sup><i class="fas fa-question-circle tooltips" title="{{Si cette option est activée, les traces de ce watchdog seront enregistrées dans watchdog_ suivi de l'Id de l'eqLogic}}"></i></sup>
+							</label></i>
 							<div class="col-sm-3">
 								<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="logspecifique">{{Activé}}</label>
 							</div>
 						</div>
-						<br>
-
-						<div class="form-group">
+						
+						<div class=" form-group">
 							<label class="col-xs-3 control-label">{{Auto-actualisation (cron)}}
 								<sup><i class="fas fa-question-circle tooltips" title="{{Fréquence de mise à jour du watchdog}}"></i></sup>
 							</label>
@@ -352,9 +345,12 @@ $eqLogics = eqLogic::byType($plugin->getId());
 				<a class="btn btn-success btn-sm bt_addControle pull-left" data-type="action" style="margin-top:-15px;"><i class="fa fa-plus-circle"></i> {{Ajouter un contrôle}}</a>
 				<a id="afficheCalculs" class="btn btn-info btn-sm bt_afficheCalculs pull-right" data-type="action" style="margin-top:-15px;"><i class="fas fa-square-root-alt"></i> {{Afficher les calculs}}</a><a id="masqueCalculs" class="btn btn-warning btn-sm bt_masqueCalculs pull-right" data-type="action" style="margin-top:5px;"><i class="fas fa-square-root-alt"></i> {{Masquer les calculs}}</a>
 				<br>
-
+				<!-- champ resultatAjax utilisé pour récupérer les appels des fonctions ajax (pas trouvé de meilleur moyen) -->
+				<textarea id="resultatAjax" name="message" hidden></textarea>
 				<div class="alert-info bg-success">
-					Vous pouvez entrer dans la zone contrôle n'importe quelle expression reconnue dans les scénarios. Cette expression doit renvoyer True (=1) ou False (=0). Vous pouvez tester l'expression dans le Testeur d'expressions (menu Outils). Les expressions incorrectes sont ignorées lors de l'exécution du watchdog en mode programmé ou via la commande Refresh.
+					Vous pouvez entrer dans la zone contrôle n'importe quelle expression reconnue dans les scénarios. Cette expression doit renvoyer True (=1) ou False (=0).
+					<br>Vous pouvez tester l'expression dans le Testeur d'expressions (menu Outils).
+					<br>Les expressions incorrectes sont ignorées lors de l'exécution du watchdog en mode programmé ou via la commande Refresh.
 					<br>
 				</div>
 				<!-- ICI la partie qui affiche le résultat global dans le cas d'un mode ET/OU-->
@@ -362,25 +358,29 @@ $eqLogics = eqLogic::byType($plugin->getId());
 				</div>
 
 				<legend><i class="icon jeedomapp-settings" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Variables}}</span></legend>
-				<br>
 				<table border="0">
 					<tbody>
 						<tr>
-							<td style="text-align: right; width: 100px;"><b>Expression</b></td>
+							<td style="text-align: right; width: 100px;"><b>Macro</b></td>
 							<td>
 								<div class="input-group">
-									<input style="width: 500px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="expr" />
+									<input style="width: 1000px;" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="macro" />
 								</div>
 							</td>
 						</tr>
-
 					</tbody>
 				</table><br>
 				<div class="alert-info bg-success">
-					L'expression peut être utilisée pour éviter de répéter les .................<br><br>
+					La macro peut être utilisée pour répéter les mêmes conditions en faisant varier les paramètres qui peuvent être des équipements, des commandes ou toute autre donnée passé en argument.
+					<br>Définissez l'expression en utilisant les parametres _arg0_, _arg1_, ... qui représentent les paramètres.
+					<br>Vous pouvez ensuite utiliser la macro dans la condition avec la syntaxe _macro_(arg1,arg2, ... ).
+					<br>Par exemple pour tester qu'un équipement actif est en ligne, vous pouvez définir la macro suivante: #_arg0_#....
+					<br>Vous utiliser la macro dans la condition avec la syntaxe _macro_(...,...).
+					<br>Le test généré sera ....
+					<br>Noter que l'assistant permet de sélectionner un équipement ou une commande et de générer la macro correspondante.
 					<br>
 				</div>
-								<br>
+				<br>
 				<table border="0">
 					<tbody>
 						<tr>
@@ -410,9 +410,9 @@ $eqLogics = eqLogic::byType($plugin->getId());
 					</tbody>
 				</table><br>
 				<div class="alert-info bg-success">
-					Les variables peuvent être utilisées pour faire des tests dans un contrôle. Par exemple, mettre _var1_ pour récupérer la variable 1 dans la formule du contrôle.<br><br>
-					<br>
+					Les variables peuvent être utilisées pour faire des tests dans un contrôle. Par exemple, mettre _var1_ pour récupérer la variable 1 dans la formule du contrôle.
 				</div>
+				<br>
 				<table border="0">
 					<tbody>
 						<tr>
