@@ -164,8 +164,18 @@ if (!isConnect()) {
             </select>
         </div>
     </div>
-    <br>
 
+    <div class=" form-group">
+        <label class="col-sm-3 control-label">{{Suppression automatique}}
+            <sup><i class="fas fa-question-circle tooltips" title="{{Suppression dans le reporting si la condition ou le watchdog est supprimé}}"></i></sup>
+        </label>
+        <div class="col-sm-3">
+            <select style="width: 150px;" id="sel_ReportingSuppressionAutomatique" class="configKey form-control" data-l1key="ReportingSuppressionAutomatique">
+                <option value="">{{Oui}}</option>
+                <option value="0">{{Non}}</option>
+            </select>
+        </div>
+    </div>
 
 
 </form>
