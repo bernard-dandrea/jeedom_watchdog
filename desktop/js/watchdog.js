@@ -75,7 +75,7 @@ $('#bt_cronGenerator').off('click').on('click', function () {
 	});
 });
 
-$('.bt_plugin_view_log').on('click', function () {
+$('.bt_plugin_view_log').off('click').on('click', function () {
 	$('#md_modal').dialog({ title: "{{Log de }}" + $('.eqLogicAttr[data-l1key=name]').value() });
 	$("#md_modal").load('index.php?v=d&modal=log.display&log=watchdog_' + $('.eqLogicAttr[data-l1key=id]').value()).dialog('open');
 
@@ -199,21 +199,24 @@ function addCmdToTable(_cmd, type) {
 			var iconAvant = '<i class="far fa-question-circle" style="color: #ffffff!important;"></i>';
 	}
 
-	var tr = '<tr class="cmd info" >'; //la couleur ne fonctionne pas à cause de info mais on ne peut pas supprimer info
+	var tr = '<tr class="cmd info" >';
+	tr += '<td width=30>';
+	//	tr += '<input type="checkbox" class="cmdAttr" data-l1key="configuration" data-l2key="disable"  title="{{Cocher pour désactiver la condition}}" />';
 
+	tr += '<input type="checkbox" style="" class="cmdAttr" data-l1key="configuration" data-l2key="disable"  title="{{Cocher pour désactiver la condition}}" />';
+	tr += '</td>';
 	tr += '<td width=160>';
-
 	tr += '<input class="cmdAttr form-control input-sm" data-l1key="name" style="width : 140px;" placeholder="{{Nom}}">';
 	tr += '<span style="display:none;" class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>';
 	tr += '<input class="cmdAttr form-control" type="hidden" data-l1key="subType" value="watchdog">';
 	tr += '</td>';
 	tr += '<td >';
+
 	tr += ' <input class="cmdAttr form-control input-sm"  data-type="' + _cmd.type + '" data-l1key="configuration" data-l2key="controle"  style="margin-bottom : 5px;width : 80%; display : inline-block;" >';
 	tr += ' <input class="cmdAttr form-control "  data-l1key="id"  style="display: none;" >';
 	tr += '<a class="btn btn-info btn-sm cursor listCmdInfo" data-type="' + _cmd.type + '"  style="margin-left : 5px;"><i class="fa fa-list-alt"  title="{{Assistant}}" style="color: #ffffff!important;"></i></a>';
+	tr += '<a class="btn btn-info btn-sm cursor macro" data-type="macro"  style="margin-left : 5px;"><i class="fab fa-medium-m" title="{{Convertir en macro}}" style="color: #ffffff!important;"></i></a>';
 	tr += '<a class="btn btn-info btn-sm cursor testexpression" data-type="testexpression"  style="margin-left : 5px;"><i class="fas fa-check" title="{{Tester l\'expression}}" style="color: #ffffff!important;"></i></a>';
-	tr += '<a class="btn btn-info btn-sm cursor macro" data-type="macro"  style="margin-left : 5px;"><i class="fab fa-mixer" title="{{Convertir en macro}}" style="color: #ffffff!important;"></i></a>';
-
 
 	tr += '<div hidden class="calcul"><small><i>';
 	tr += '<span style="margin-top : 9px; margin-left: 10px; " class="cmdAttr" data-l1key="configuration" data-l2key="calcul"></span></i></small></div>';
@@ -285,11 +288,6 @@ $('.bt_addAction').off('click').on('click', function () {
 	addAction({}, "watchdogAction", "Nouvelle");
 });
 
-// suppression d'une action
-$("body").delegate('.bt_removeAction', 'click', function () {
-	var type = $(this).attr('data-type');
-	$(this).closest('.' + type).remove();
-});
 
 // Test d'une action
 $('#div_pageContainer').off('click').on('click', '.cmdAction[data-action=testaction]', function (event) {
@@ -336,7 +334,7 @@ function addAction(_action, type, id_action = "") {
 	var div = '<div class="watchdogAction  alert-' + couleur + '">';
 	div += '<div class="form-group ">';
 	div += '<div class="col-sm-2">';
-	div += '<input type="checkbox" style="margin-top : 11px;margin-right : 5px;margin-left : 5px;" class="expressionAttr" data-l1key="options" data-l2key="enable" checked title="{{Décocher pour désactiver l\'action}}" />';
+	div += '<input type="checkbox" style="margin-top : 11px;margin-right : 5px;margin-left : 5px;" class="expressionAttr" data-l1key="options" data-l2key="disable" checked title="{{Décocher pour désactiver l\'action}}" />';
 	div += '<input type="checkbox" style="margin-top : 11px;margin-right : 5px;" class="expressionAttr" data-l1key="options" data-l2key="background" title="Cocher pour que la commande s\'exécute en parallèle des autres actions" />';
 	div += '<input type="checkbox" class="expressionAttr tooltipstered" style="margin-top : 11px;margin-right : 5px;" data-l1key="options" data-l2key="log" checked title="Cocher pour que l\'action soit enregistrée dans le fichier log \'watchdog_actions\'" />';
 	div += '<select class="expressionAttr form-control input-sm" data-l1key="actionType" style="margin-bottom: 10px;width:calc(100% - 70px);display:inline-block">';
@@ -348,18 +346,18 @@ function addAction(_action, type, id_action = "") {
 	div += '<div class="col-sm-5" style="margin-top : 5px;">';
 	div += '<div class="input-group" >';
 	div += '<span class="input-group-btn">';
-	div += '<a class="btn bt_removeAction btn-sm" data-type="watchdogAction"><i class="fa fa-minus-circle"></i></a>';
+	div += '<a class="btn removeAction btn-sm" data-type="removeAction"><i class="fa fa-minus-circle"></i></a>';
 	div += '</span>';
 	div += '<input class="expressionAttr form-control input-sm cmdAction" data-l1key="cmd" data-type="watchdogAction" />';
 	div += '<span class="input-group-btn">';
-	div += '<a class="btn btn-primary btn-sm listAction" data-type="watchdogAction" title="{{Sélectionner un mot-clé}}"><i class="fa fa-tasks"></i></a>';
-	div += '<a class="btn btn-primary btn-sm listCmdAction" data-type="watchdogAction"  title="{{Sélectionner la commande}}" ><i class="fa fa-list-alt"></i></a>';
+	div += '<a class="btn btn-primary btn-sm listAction" data-type="listAction" title="{{Sélectionner un mot-clé}}"><i class="fa fa-tasks"></i></a>';
+	div += '<a class="btn btn-primary btn-sm listCmdAction" data-type="listCmdAction"  title="{{Sélectionner la commande}}" ><i class="fa fa-list-alt"></i></a>';
 	div += '</span>';
 	div += '</div>';
 
 	// La commande c'est : _action.cmd
 	if (is_numeric(id_action)) {
-		div += '<a class="btn btn-primary btn-xs cmdAction" data-action="testaction" id_action="' + id_action + ' title="' + id_action + ' controlename="' + id_action + '"><i class="fa fa-rss"></i> Tester</a>';
+		div += '<a class="btn btn-primary btn-xs cmdAction" data-action="testaction" id_action=' + id_action + '  title="{{Tester la commande}}" ><i class="fa fa-rss"></i> Tester</a>';
 	}
 
 	div += '</div>';
@@ -470,7 +468,8 @@ function printEqLogic(_eqLogic) {
 		avantDernierLancement = avantDernierLancement.replace('SAVE ', '');
 	}
 
-	$titreCondition = ' <tr><th style="width: 160px;">{{  Nom}}</th><th>{{  Contrôle}}</th><th class="text-center" style="width:150px;">Avant-dernier Résultat<br><small>' + avantDernierLancement + '</small></th><th class="text-center" style="width:150px;">Dernier Résultat<br><small>' + dernierLancement + '</small></th><th style="width:40px;"></th></tr>';
+	$titreCondition = ' <tr><th style="width: 40px;">{{Inactif}}</th><th style="width: 160px;">{{  Nom}}</th><th>{{  Contrôle}}</th><th class="text-center" style="width:150px;">Avant-dernier Résultat<br><small>' + avantDernierLancement + '</small></th><th class="text-center" style="width:150px;">Dernier Résultat<br><small>' + dernierLancement + '</small></th><th style="width:40px;"></th></tr>';
+
 	$('#table_controlesTitre').append($titreCondition);
 
 	// On remplit la table_actions
@@ -526,26 +525,45 @@ function printEqLogic(_eqLogic) {
 	}
 }
 
-// --Boutons pour sélectionner les commandes jeedom
+// --Boutons pour gérer les boutons associés aux commandes
 
-$("body").delegate(".listCmdAction", 'click', function () {
+$("#table_actions").off('click').on('click', ".listAction,.listCmdAction,.removeAction", function () {
 
 	var type = $(this).attr('data-type');
-	var el = $(this).closest('.' + type).find('.expressionAttr[data-l1key=cmd]');
-	jeedom.cmd.getSelectModal({ cmd: { type: 'action' } }, function (result) {
-		el.value(result.human);
-		jeedom.cmd.displayActionOption(el.value(), '', function (html) {
-			el.closest('.' + type).find('.actionOptions').html(html);
-			jeedomUtils.taAutosize();
+	var el = $(this).closest('.watchdogAction').find('.expressionAttr[data-l1key=cmd]');
+	if (type == 'listAction') {
+		console.log("listAction");
+		jeedom.getSelectActionModal({}, function (result) {
+			el.value(result.human);
+			jeedom.cmd.displayActionOption(el.value(), '', function (html) {
+				el.closest('.watchdogAction').find('.actionOptions').html(html);
+				taAutosize();
+			});
 		});
-	});
+	}
+
+	if (type == 'listCmdAction') {
+		jeedom.cmd.getSelectModal({ cmd: { type: 'action' } }, function (result) {
+			el.value(result.human);
+			jeedom.cmd.displayActionOption(el.value(), '', function (html) {
+				el.closest('.watchdogAction').find('.actionOptions').html(html);
+				jeedomUtils.taAutosize();
+			});
+		});
+	}
+
+	// suppression d'une action
+	if (type == 'removeAction') {
+		var type = $(this).attr('data-type');
+		$(this).closest('.watchdogAction').remove();
+	}
+
 });
 
 //-------------------------------------
 // Assistant pour remplir facilement le test à faire sur un equipement
 // et lancer le test sur l'expression
 //-------------------------------------
-//$("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression", function () {
 $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.macro", function () {
 
 	var type = $(this).attr('data-type');
@@ -617,16 +635,53 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 			});
 
 			var equip = $("#resultatAjax").val();
-
+			console.log('equip: ' + equip);
 			if (equip.trim() != '') {
-				// crée la macro en remplacant l equipement trouvé par _arg0_
-				var regex = new RegExp(echapperRegex('#' + equip + '#'), "gi");
-				var macro = condition.replace(regex, "_arg0_");
-				regex = new RegExp(echapperRegex(equip), "gi");
-				macro = condition.replace(regex, "_arg0_");
-				el_macro.value(macro);
-				// remplace la condition en utilisant la macro
-				el_controle.value('_macro_(#' + equip + '#)');
+				if (condition.includes(equip)) {
+					// crée la macro en remplacant l equipement trouvé par _arg0_
+					var regex = new RegExp(echapperRegex(equip), "gi");
+					var macro = condition.replace(regex, "_arg0_");
+					regex = new RegExp(echapperRegex(equip), "gi");
+					macro = condition.replace(regex, "_arg0_");  // remplace l'équipement ex #[maison][Network1]# -> _arg0_
+					macro = macro.replace(equip.slice(0, -1), "#_arg0_"); // remplace les commandes ex #[maison][Network1][Statut]# -> #_arg0_[Statut]#
+					el_macro.value(macro);
+
+					// remplace la condition en utilisant la macro
+					el_controle.value('_macro_(' + equip + ')');
+				}
+				else {
+					// equipement non trouvé dans la condition --> on va chercher à remplacer la première commande
+					$("#resultatAjax").val('');
+					$.ajax({
+						type: "POST",
+						url: "plugins/watchdog/core/ajax/watchdog.ajax.php",
+						data:
+						{
+							action: "cherche_commande_dans_expression",
+							condition: condition,
+							id: id
+						},
+						async: false,
+						dataType: 'json',
+						error: function (request, status, error) {
+						},
+						success: function (data) {
+							$("#resultatAjax").val(data.result);
+						}
+					});
+					var commande = $("#resultatAjax").val();
+					if (condition.includes(commande)) {
+						// crée la macro en remplacant l commandeement trouvé par _arg0_
+						var regex = new RegExp(echapperRegex(commande), "gi");
+						var macro = condition.replace(regex, "_arg0_");
+						regex = new RegExp(echapperRegex(commande), "gi");
+						macro = condition.replace(regex, "_arg0_");
+						el_macro.value(macro);
+						// remplace la condition en utilisant la macro
+						el_controle.value('_macro_(' + commande + ')');
+					}
+
+				}
 			}
 		}
 	}
@@ -636,11 +691,6 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 		var el = $(this).closest('.' + type).find('.cmdAttr[data-l1key=configuration][data-l2key=controle]');
 		var el_name = $(this).closest('.' + type).find('.cmdAttr[data-l1key=name]');
 
-		/* apparemment, instructions ne servent à rien
-		if (expression.find('.cmdAttr[data-l1key=type]').value() == 'action') {
-			type = 'action';
-		}
-	*/
 		tempo1 = $('.eqLogicAttr[data-l1key=configuration][data-l2key=tempo1]').value() + " secondes";
 		if (tempo1 == " secondes") tempo1 = 'à configurer';
 		tempo2 = $('.eqLogicAttr[data-l1key=configuration][data-l2key=tempo2]').value() + " secondes";
@@ -716,24 +766,11 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 						if ($('#r11').value() == "1") {
 							//------------L'utilisateur demande a choisir l'équipement --
 							// Lancement de l'écran numéro 2/3	
-							jeedom.eqLogic.getSelectModal({ cmd: {} }, function (result) {
+							jeedom.eqLogic.getSelectModal({}, function (result) {
 								var date = new Date();
 
-								chaine = result.human;  // utilisé pour donner le nom du contrôle
-								for (var i = 0; i < chaine.length; i++) {
-									test = chaine.substring(i, i + 2);
-									if (test == "][") {
-										chaine = chaine.substring(i + 2);
-										break;
-									}
-								}
-								for (var i = 0; i < chaine.length; i++) {
-									test = chaine.substring(i, i + 2);
-									if (test == "]#") {
-										chaine = chaine.substring(0, i);
-										break;
-									}
-								}
+								// utilisé pour donner le nom au controle
+								var controlname = extractName(result.human);
 
 								//vient de desktop/js/scenario.js
 								// Texte de l'écran numéro 3/3	
@@ -769,7 +806,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 
 								message += '<div class="form-group"> ' +
 									'             <div class="col-xs-12">' +
-									'  <input type="checkbox" checked="true" style="margin-top : 11px;margin-right : 10px;" class="conditionAttr" data-l1key="configuration" data-l2key="assistName" > Mettre <b>' + chaine + '</b> comme nom au contrôle' +
+									'  <input type="checkbox" checked="true" style="margin-top : 11px;margin-right : 10px;" class="conditionAttr" data-l1key="configuration" data-l2key="assistName" > Mettre <b>' + controlname + '</b> comme nom au contrôle' +
 									'       </div>' +
 									'</div><hr>';
 								message += '<div class="form-group"> ' +
@@ -803,7 +840,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 
 												var condition = result.human;
 
-												if ($('#r11').value() == '1') {
+												if ($('#r11').value() == '1') {    // Equipement : tester la dernière communication
 													//On regarde quel est le tempo sélectionné 
 													switch ($('.conditionAttr[data-l1key=choixtempo]').value()) {
 														case '2':
@@ -815,20 +852,18 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 														default:
 															choixtempo = "_tempo1_";
 													}
-													// On est dans le cas : Tester le délai depuis la dernière mise à jour de xxx ou aucune case
 													condition = '(#timestamp# - strtotime(lastCommunication(' + condition + "))) > " + choixtempo;
 												}
 
-												if ($('#r12').value() == '1') {
-													// On est dans le cas : utiliser la fonction _test_
-													condition = 'isEnabled(' + condition + ") == 1";
+												if ($('#r12').value() == '1') {  // Equipement : tester si l'équipement est actif
+													condition = 'eqEnable(' + condition + ") == 1";
 												}
 
-												if ($('#r13').value() == '1') {
-													// On est dans le cas : utiliser la fonction _test_
+												if ($('#r13').value() == '1') {  // // Equipement : macro
 													condition = '_macro_(' + condition + ")";
 												}
 
+												// Ajout du ET / OU à la condition
 												condition += ' ' + $('.conditionAttr[data-l1key=next]').value() + ' ';
 
 												valeurprecedente = chaineExpressionTest
@@ -840,10 +875,10 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 													//remplit la Condition(); //on reboucle pour une autre condition
 												}
 												else {
-													el.value(condition);
+													el.atCaret('insert', condition);
 													// Si la case à cocher qui permet de mettre automatiquement le nom de l'équipement est cochée
 													if ($('.conditionAttr[data-l1key=configuration][data-l2key=assistName]').value() == '1')
-														el_name.value(chaine);
+														el_name.value(controlname);
 
 													chaineExpressionTest = "";
 
@@ -863,21 +898,8 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 							jeedom.cmd.getSelectModal({ cmd: { type: 'info' } }, function (result) {
 								var date = new Date();
 
-								chaine = result.human;
-								for (var i = 0; i < chaine.length; i++) {
-									test = chaine.substring(i, i + 2);
-									if (test == "][") {
-										chaine = chaine.substring(i + 2);
-										break;
-									}
-								}
-								for (var i = 0; i < chaine.length; i++) {
-									test = chaine.substring(i, i + 2);
-									if (test == "][") {
-										chaine = chaine.substring(0, i);
-										break;
-									}
-								}
+								// utilisé pour donner le nom au controle
+								var controlname = extractName(result.human);
 
 								//vient de desktop/js/scenario.js
 								// Texte de l'écran numéro 3/3	
@@ -928,7 +950,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 
 								message += '<div class="form-group"> ' +
 									'             <div class="col-xs-12">' +
-									'  <input type="checkbox" checked="true" style="margin-top : 11px;margin-right : 10px;" class="conditionAttr" data-l1key="configuration" data-l2key="assistName" > Mettre <b>' + chaine + '</b> comme nom au contrôle' +
+									'  <input type="checkbox" checked="true" style="margin-top : 11px;margin-right : 10px;" class="conditionAttr" data-l1key="configuration" data-l2key="assistName" > Mettre <b>' + controlname + '</b> comme nom au contrôle' +
 									'       </div>' +
 									'</div><hr>';
 								message += '<div class="form-group"> ' +
@@ -963,7 +985,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 												var condition = result.human;
 												// BD pas utilisé	var test = result.cmd.subType;
 
-												if ($('#r11').value() == '1') {
+												if ($('#r11').value() == '1') {     // Commande : tester le changement d'éatat dernière communication
 													condition += ' ' + $('.conditionAttr[data-l1key=operator]').value();
 													if (result.cmd.subType == 'string') {
 														if ($('.conditionAttr[data-l1key=operator]').value() == 'matches') {
@@ -974,11 +996,9 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 													} else {
 														condition += ' ' + $('.conditionAttr[data-l1key=operande]').value();
 													}
-
 												}
 
-												if ($('#r12').value() == '1') {
-													//On regarde quel est le tempo sélectionné 
+												if ($('#r12').value() == '1') {    // Commande : tester la dernière communication
 													switch ($('.conditionAttr[data-l1key=choixtempo]').value()) {
 														case '2':
 															choixtempo = "_tempo2_";
@@ -994,8 +1014,8 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 													condition = 'age(' + condition + ") > " + choixtempo;
 												}
 
-												if ($('#r13').value() == '1') {
-													// On est dans le cas : utiliser la fonction _test_
+												if ($('#r13').value() == '1') {   // Commande : macro
+													// générer macro
 													condition = '_macro_(' + condition + ")";
 												}
 
@@ -1009,10 +1029,10 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 													eldebut.click();
 												}
 												else {
-													el.value(condition);
+													el.atCaret('insert', condition);
 													// Si la case à cocher qui permet de mettre automatiquement le nom de l'équipement est cochée
 													if ($('.conditionAttr[data-l1key=configuration][data-l2key=assistName]').value() == '1')
-														el_name.value(chaine);
+														el_name.value(controlname);
 
 													chaineExpressionTest = "";
 
@@ -1026,7 +1046,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 						else {
 							//------------L'utilisateur demande a choisir le controle de l'IP --
 							var currentLocationhostname = window.location.hostname;
-							el.value('#internalAddr# = "' + currentLocationhostname + '"');
+							el.atCaret('insert', '#internalAddr# = "' + currentLocationhostname + '"');
 						}
 
 						// Début Fermeture des parenthèses et accolades du premier bootbox.dialog
@@ -1047,3 +1067,8 @@ function echapperRegex(chaine) {
 	return chaine.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }
 
+function extractName(chaine) {
+	const regex = /\[([^\]]+)\]#/;
+	const match = chaine.match(regex);
+	return match ? match[1] : null;
+}
