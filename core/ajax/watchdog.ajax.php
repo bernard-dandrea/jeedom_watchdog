@@ -20,7 +20,6 @@ try {
 	require_once __DIR__ . '/../../../../core/php/core.inc.php';
 	include_file('core', 'authentification', 'php');
 
-
 	if (init('action') == 'testaction') {
 		$watchdog = watchdog::byId(init('id'));
 		if (!is_object($watchdog)) {
@@ -32,12 +31,19 @@ try {
 		$equip = '';
 		if ($watchdog->getConfiguration('typeControl', '') == '') {
 			foreach ($watchdog->getCmd() as $condition) {
-				$controlname = $condition->getName();
-				$equip = $condition->getConfiguration("equip", "");
-				break;
+
+				if ($condition->getLogicalId() != 'resultatglobal' && $condition->getLogicalId() != 'refresh') {
+					$controlname = $condition->getName();
+					$equip = $condition->getConfiguration("equip", "");
+					if ($equip <> '')
+						$equip = jeedom::toHumanReadable($equip);
+					$cmd_opt = $condition->getConfiguration("cmd", "");
+					if ($cmd_opt <> '')
+						$cmd_opt = jeedom::toHumanReadable($cmd_opt);
+					break;
+				}
 			}
 		}
-
 
 		$comptageid = 0;  // sert à se positionner sur la bonne action 
 		foreach ($watchdog->getConfiguration('watchdogAction') as $cmd) {
@@ -46,13 +52,21 @@ try {
 				foreach ($optionsCommandeaTester as $key => $option) {
 					if ($controlname <> '')
 						$option = str_replace("#controlname#", $controlname, $option);
-					if ($equip <> '')
+					if ($equip <> '') {
 						$option  = str_replace("_equip_", $equip, $option);
-					$optionsCommandeaTester[$key] = $watchdog->remplace_parametres($option, $key);  // remplace les parametres dans les options de la commande
+						$option  = str_replace("_equipname_", str_ireplace('#', '', $equip), $option);
+					}
+					if ($cmd_opt <> '') {
+						$option  = str_replace("_cmd_",  $cmd_opt, $option);
+						$option  = str_replace("_cmdname_", str_ireplace('#', '', $cmd_opt), $option);
+					}
+					$optionsCommandeaTester[$key] = jeedom::toHumanReadable($watchdog->remplace_parametres($option, $key));  // remplace les parametres dans les options de la commande
 				}
 				$commandeaTester = $cmd['cmd'];
 				if ($equip <> '')
 					$commandeaTester  = str_replace("_equip_", $equip, $commandeaTester);
+				if ($cmd_opt <> '')
+					$commandeaTester  = str_replace("_cmd_", $cmd_opt, $commandeaTester);
 				$commandeaTester = $watchdog->remplace_parametres($commandeaTester);   // remplace les paramètres dans la commande
 
 				log::add('watchdog', 'debug', '**************************************************************************************************************************');
@@ -74,8 +88,23 @@ try {
 		$equip = '';
 		if (is_object($watchdogCmd)) {
 			$equip = $watchdogCmd->cherche_equipement_dans_expression($condition);
+			$equip = jeedom::toHumanReadable($equip);
 		}
 		ajax::success($equip);
+	}
+
+	if (init('action') == 'cherche_commande_dans_expression') {
+
+		$condition = init('condition');
+		$id = init('id');
+
+		$watchdogCmd = watchdogCmd::byId($id);
+		$equip = '';
+		if (is_object($watchdogCmd)) {
+			$commande = $watchdogCmd->cherche_commande_dans_expression($condition);
+			$commande = jeedom::toHumanReadable($commande);
+		}
+		ajax::success($commande);
 	}
 
 	if (init('action') == 'test_expression') {
