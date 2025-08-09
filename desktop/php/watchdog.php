@@ -55,7 +55,8 @@ $eqLogics = eqLogic::byType($plugin->getId());
 			<a class="btn btn-default eqLogicAction " style="margin-right:5px" data-action="configure" title="{{Configuration avancée du Watchdog}}"><i class="fas fa-cogs"></i> </a>
 			<a class="btn btn-warning eqLogicAction " style="margin-right:5px" data-action="copy" title="{{Dupliquer cet équipement}}"><i class="fas fa-copy"></i> </a>
 			<a class="btn btn-danger eqLogicAction " style="margin-right:5px" data-action="remove" title="{{Supprimer le Watchdog}}"><i class="fas fa-minus-circle"></i> </a>
-			<a class="btn btn-success eqLogicAction " style="margin-right:5px" data-action="save" title="{{Attention, lors de la sauvegarde, seuls les contrôles sont effectués, le résultat global n'est pas calculé et reste inchangé. Il sera mis à jour lors du lancement du prochain contrôle par le CRON ou la commande refresh. Les actions ne sont pas lancées non plus.}}"><i class="fas fa-check-circle"></i> {{Sauver / Contrôler}}</a>
+			<a class="btn btn-default  " style="margin-right:5px" onclick="location.reload();" title="{{Recharger la page sans sauvegarder les modifications}}" ><i class="fas fa-sync-alt"></i> </a>
+			<a class="btn btn-success eqLogicAction" style="margin-right:5px" data-action="save" title="{{Attention, lors de la sauvegarde, seuls les contrôles sont effectués, le résultat global n'est pas calculé et reste inchangé. Il sera mis à jour lors du lancement du prochain contrôle par le CRON ou la commande refresh. Les actions ne sont pas lancées non plus.}}"><i class="fas fa-check-circle"></i> {{Sauver / Contrôler}}</a>
 		</div>
 
 		<!-- Liste des onglets -->
@@ -113,7 +114,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 								<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="isVisible" checked>{{Visible}}</label>
 							</div>
 						</div>
-						
+
 						<div class="form-group">
 							<label class="col-sm-3 control-label">{{Log spécifique pour ce watchdog}}
 								<sup><i class="fas fa-question-circle tooltips" title="{{Si cette option est activée, les traces de ce watchdog seront enregistrées dans watchdog_ suivi de l'Id de l'eqLogic}}"></i></sup>
@@ -122,7 +123,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 								<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="logspecifique">{{Activé}}</label>
 							</div>
 						</div>
-						
+
 						<div class=" form-group">
 							<label class="col-xs-3 control-label">{{Auto-actualisation (cron)}}
 								<sup><i class="fas fa-question-circle tooltips" title="{{Fréquence de mise à jour du watchdog}}"></i></sup>
@@ -330,7 +331,18 @@ $eqLogics = eqLogic::byType($plugin->getId());
 								</select>
 							</div>
 						</div>
-
+						<div class=" form-group">
+							<label class="col-sm-3 control-label">{{Suppression automatique}}
+								<sup><i class="fas fa-question-circle tooltips" title="{{Suppression dans le reporting si la condition ou le watchdog est supprimé}}"></i></sup>
+							</label>
+							<div class="col-sm-3">
+								<select style="width: 150px;" id="sel_ReportingSuppressionAutomatique" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="ReportingSuppressionAutomatique">
+									<option value="">{{Valeur par défaut}}</option>
+									<option value="1">{{Oui}}</option>
+									<option value="0">{{Non}}</option>
+								</select>
+							</div>
+						</div>
 					</fieldset>
 				</form>
 			</div>
@@ -371,13 +383,13 @@ $eqLogics = eqLogic::byType($plugin->getId());
 					</tbody>
 				</table><br>
 				<div class="alert-info bg-success">
-					La macro peut être utilisée pour répéter les mêmes conditions en faisant varier les paramètres qui peuvent être des équipements, des commandes ou toute autre donnée passé en argument.
+					La macro peut être utilisée pour répéter les mêmes conditions en faisant varier les paramètres qui peuvent être des équipements, des commandes ou toute autre donnée passée en argument.
 					<br>Définissez l'expression en utilisant les parametres _arg0_, _arg1_, ... qui représentent les paramètres.
-					<br>Vous pouvez ensuite utiliser la macro dans la condition avec la syntaxe _macro_(arg1,arg2, ... ).
-					<br>Par exemple pour tester qu'un équipement actif est en ligne, vous pouvez définir la macro suivante: #_arg0_#....
-					<br>Vous utiliser la macro dans la condition avec la syntaxe _macro_(...,...).
-					<br>Le test généré sera ....
-					<br>Noter que l'assistant permet de sélectionner un équipement ou une commande et de générer la macro correspondante.
+					<br>Vous pouvez ensuite utiliser la macro dans la condition avec la syntaxe _macro_(arg0,arg1, ... ) par exemple _macro_(#[Maison][Température Pieces][Cuisine timestamp]#,_tempo1_) .
+					<br>Par exemple pour tester qu'une commande est mise à jour régulièrement, la macro suivante: age(_arg0_) > _arg1_ et age(_arg0_)>0
+					<br>Vous utiliser la macro dans la condition avec la syntaxe : _macro_(#[Maison][Température Pieces][Cuisine timestamp]#,_tempo1_)
+					<br>Le test généré sera (avec tempo1 = 600): age(#[Maison][Température Pieces][Cuisine timestamp]#) > 600 et age(#[Maison][Température Pieces][Cuisine timestamp]#)>0
+					<br>Noter que l'assistant permet de sélectionner un équipement ou une commande et de générer l'appel à la macro.
 					<br>
 				</div>
 				<br>
@@ -435,7 +447,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 				</table><br>
 
 				<div class="alert-info bg-success">
-					Les variables tempo peuvent être utilisées pour faire des tests dans un contrôle. Par exemple, mettre #tempo1# pour récupérer la valeur de la tempo1 dans la formule du contrôle
+					Les variables tempo peuvent être utilisées pour faire des tests dans un contrôle. Par exemple, mettre _tempo1_ (ou #tempo1#) pour récupérer la valeur de la tempo1 dans la formule du contrôle
 					<br>
 				</div>
 				<br>
@@ -495,14 +507,14 @@ $eqLogics = eqLogic::byType($plugin->getId());
 				<br><br>
 				<div class="alert-info bg-success">
 					Vous pouvez utiliser #title# pour récupérer le nom du watchdog.
-					<br><br>Vous pouvez également utiliser les variables _equipX_ et #tempoX# dans les commandes et leurs paramètres<br>
+					<br><br>Vous pouvez également utiliser les variables _equipX_ et _tempoX_ dans les commandes et leurs paramètres<br>
 					<br><br>Exemple: envoi d'un mail avec la date de dernière communication
 					<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Titre--> Communication perdue avec #title#
 					<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Message --> Dernière communication avec _equip1_ : value(_equip1_[Dernière communication])
-					<br><br> Dans la configuration 'Actions sur chaque contrôle indépendamment', vous pouvez utiliser #controlname# pour récupérer le nom du contrôle et _equip_ pour récupérer le premier équipement référencé dans le contrôle (soit directement, soit via une commande)
+					<br><br> Dans la configuration 'Actions sur chaque contrôle indépendamment', vous pouvez utiliser #controlname# pour récupérer le nom du contrôle et _equip_ (_equipname_ pour le nom) pour récupérer le premier équipement référencé dans le contrôle (soit directement, soit via une commande) et _cmd_ (_cmdname_ pour le nom)pour la première commande
 					<br><br>Exemple: envoi d'un mail avec la date de dernière communication
-					<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Titre--> Communication perdue avec #controlname#
-					<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Message --> Dernière communication avec _equip_ : value(_equip_[Dernière communication])
+					<br><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Titre--> #controlname# n'est plus en ligne
+					<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* Message --> Dernière communication avec _equipname_ : lastCommunication(_equip_)
 				</div>
 
 			</div>
