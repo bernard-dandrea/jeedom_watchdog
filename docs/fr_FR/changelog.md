@@ -4,15 +4,11 @@
 >
 >S'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
 
-**BETA**
+**Version 2025-08-04**
 
-*   Refote du code afin d'améliorer la compréhension (suppression des commentaires et codes inutiles et indentation du code, ...) dans watchdog.ajax.php,watchdog.class.php, watchdog.js et watchdog.php
-*   dans watchdog.js, ajout jeedomUtils. pour fonctions dépréciées uniqId et taAutosize
-*   Ajout de la commande Refresh (créée lors de la sauvegarde de l'équipement). On peut lancer un Refresh en cliquant sur l'icone en haut à droite de la tuile.
-*   Ajout dans la configuration du plugin et au niveau de chaque équipement d'un paramètre indiquant si le contrôle est OK lorsque le résultat global est à true ou à false. Cela permet d'indiquer la crosse verte si le résultat des contrôles est False
-*   Reporting des watchdogs dans un virtuel
-*   Possibilité de spécifier le widget à utiliser pour le Résultat Global et le reporting
-*   Ajout de variables pour les équipements pour utilisation dans les conditions et actions
+Ne pas charger cette version: la demande de mise à jour est due à une erreur lors de la mise à jour du code dans Github (mise à jour de master au lieu de beta)
+
+
 
 **Version 2025-06-10**
 
@@ -20,10 +16,10 @@
 *   Application du PR de TommyChausson concernant la suppression des php notices récurrents "only variables should be passed by reference"
 *   Application du PR de TomsnCo concernant la gestion de l'arborescence
 *   Transfert de la documentation et du changelog du site de @sigalou vers github
-*   Modification de info.json pour refléter les changements de propriétaire et les liens de la documentation
+*   Modification de info.json pour refléter les changements de propriétaire et lkes liens de la documentation
 *   Blocage de la suppression du champ 'Resultat Global' qui se produisait lors de la sauvegarde
 *   Suppression du répertoire core/template qui ne sert à rien
-*   Rename de la procédure toHTML dans watchdog.class.php car elle provoque l'affichage de #cmd# dans les tuiles au lieu de 'Resultat global'
+*   Rename de la procédure toHTML dans watchdog.class.php car elle provoque l'affichage de #cmd# dans au lieu de 'Resultat global'
 
 **Version 2021-03-20 01:09:51**
 
