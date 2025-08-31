@@ -95,7 +95,35 @@ if (!isConnect()) {
             </select>
         </div>
     </div>
+    <div class=" form-group">
+        <label class="col-sm-3 control-label">{{Widget global dashboard}}
+            <sup><i class="fas fa-question-circle tooltips" title="{{Widget appliqué sur le résultat global dans la tuile du watchdog en mode dashboard}}"></i></sup>
+        </label>
+        <div class="col-sm-3">
+            <select style="width: 150px;" id="template_resultatglobal_dashboard" class="configKey form-control" data-l1key="template_resultatglobal_dashboard">
+                <option value="">{{Défaut}}</option>
+                <?php
+                echo $widgetDashboard;
+                ?>
+            </select>
+        </div>
+    </div>
+
+    <div class=" form-group">
+        <label class="col-sm-3 control-label">{{Widget global mobile}}
+            <sup><i class="fas fa-question-circle tooltips" title="{{Widget appliqué sur le résultat global dans la tuile du watchdog en mode mobile}}"></i></sup>
+        </label>
+        <div class="col-sm-3">
+            <select style="width: 150px;" id="template_resultatglobal_mobile" class="configKey form-control" data-l1key="template_resultatglobal_mobile">
+                <option value="">{{Défaut}}</option>
+                <?php
+                echo $widgetMobile;
+                ?>
+            </select>
+        </div>
+    </div>
     <br>
+
 
     <legend><i class="icon kiko-book-open" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Reporting}}</span></legend>
     <div class=" form-group">
