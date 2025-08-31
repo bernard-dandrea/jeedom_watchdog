@@ -20,6 +20,16 @@ try {
 	require_once __DIR__ . '/../../../../core/php/core.inc.php';
 	include_file('core', 'authentification', 'php');
 
+	if (init('action') == 'reporting_maintenance') {
+		$id = init('id');
+		$result = watchdogCmd::report_cmd_clean($id);		
+		$result = watchdogCmd::report_cmd_rename($id);
+		ajax::success($result);
+	}
+
+
+
+
 	if (init('action') == 'testaction') {
 		$watchdog = watchdog::byId(init('id'));
 		if (!is_object($watchdog)) {
@@ -29,17 +39,13 @@ try {
 		// en mode action sur tous les contrôles, on va récupérer les paramètres sur la première condition
 		$controlname = '';
 		$equip = '';
+		$cmd_opt = '';
 		if ($watchdog->getConfiguration('typeControl', '') == '') {
-			foreach ($watchdog->getCmd() as $condition) {
+			$condition = '';
+			foreach ($watchdog->getCmd() as $condition_select) {
 
-				if ($condition->getLogicalId() != 'resultatglobal' && $condition->getLogicalId() != 'refresh') {
-					$controlname = $condition->getName();
-					$equip = $condition->getConfiguration("equip", "");
-					if ($equip <> '')
-						$equip = jeedom::toHumanReadable($equip);
-					$cmd_opt = $condition->getConfiguration("cmd", "");
-					if ($cmd_opt <> '')
-						$cmd_opt = jeedom::toHumanReadable($cmd_opt);
+				if ($condition_select->getLogicalId() != 'resultatglobal' && $condition_select->getLogicalId() != 'refresh') {
+					$condition = $condition_select;
 					break;
 				}
 			}
@@ -50,28 +56,14 @@ try {
 			if (init('id_action') == $comptageid) {  // on se positionne sur la bonne commande
 				$optionsCommandeaTester = $cmd['options'];
 				foreach ($optionsCommandeaTester as $key => $option) {
-					if ($controlname <> '')
-						$option = str_replace("#controlname#", $controlname, $option);
-					if ($equip <> '') {
-						$option  = str_replace("_equip_", $equip, $option);
-						$option  = str_replace("_equipname_", str_ireplace('#', '', $equip), $option);
-					}
-					if ($cmd_opt <> '') {
-						$option  = str_replace("_cmd_",  $cmd_opt, $option);
-						$option  = str_replace("_cmdname_", str_ireplace('#', '', $cmd_opt), $option);
-					}
-					$optionsCommandeaTester[$key] = jeedom::toHumanReadable($watchdog->remplace_parametres($option, $key));  // remplace les parametres dans les options de la commande
+					$optionsCommandeaTester[$key] = jeedom::toHumanReadable($watchdog->remplace_parametres($option, $key, $condition));  // remplace les parametres dans les options de la commande
 				}
 				$commandeaTester = $cmd['cmd'];
-				if ($equip <> '')
-					$commandeaTester  = str_replace("_equip_", $equip, $commandeaTester);
-				if ($cmd_opt <> '')
-					$commandeaTester  = str_replace("_cmd_", $cmd_opt, $commandeaTester);
-				$commandeaTester = $watchdog->remplace_parametres($commandeaTester);   // remplace les paramètres dans la commande
+				$commandeaTester = $watchdog->remplace_parametres($commandeaTester, '', $condition);   // remplace les paramètres dans la commande
 
-				log::add('watchdog', 'debug', '**************************************************************************************************************************');
-				log::add('watchdog', 'debug', '** Exécution de la commande ' . jeedom::toHumanReadable($commandeaTester) . " avec comme option(s) : " . json_encode($optionsCommandeaTester));
-				log::add('watchdog', 'debug', '**************************************************************************************************************************');
+				log::add('watchdog_actions', 'debug', '**************************************************************************************************************************');
+				log::add('watchdog_actions', 'debug', '** Test de la commande ' . jeedom::toHumanReadable($commandeaTester) . " avec comme option(s) : " . json_encode($optionsCommandeaTester));
+				log::add('watchdog_actions', 'debug', '**************************************************************************************************************************');
 				scenarioExpression::createAndExec('action', $commandeaTester, $optionsCommandeaTester);
 			}
 			$comptageid++;
@@ -117,12 +109,32 @@ try {
 		if (is_object($watchdogCmd)) {
 			$watchdog = $watchdogCmd->getEqlogic();  // utile pour récupérer les paramètres généraux du watchdog
 			if (is_object($watchdog)) {
+				$expression = $watchdog->remplace_parametres($condition, '', $watchdogCmd);
+				$expression = jeedom::toHumanReadable($expression);
+			}
+			ajax::success($expression);
+		}
+	}
+
+
+	if (init('action') == 'test_expression') {
+
+		$condition = init('condition');
+		$id = init('id');
+
+		$watchdogCmd = watchdogCmd::byId($id);
+
+		if (is_object($watchdogCmd)) {
+			$watchdog = $watchdogCmd->getEqlogic();  // utile pour récupérer les paramètres généraux du watchdog
+			if (is_object($watchdog)) {
 				$expression = $watchdog->remplace_parametres($condition);
 				$expression = jeedom::toHumanReadable($expression);
 			}
 			ajax::success($expression);
 		}
 	}
+
+
 
 	throw new Exception(__('Aucune méthode correspondante à : ', __FILE__) . init('action'));
 	/*     * *********Catch exeption*************** */
