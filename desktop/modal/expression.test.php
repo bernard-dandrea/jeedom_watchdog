@@ -15,8 +15,10 @@
 * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
 */
 
+
 // ce programme est une copie du script standard de jeedom pour tester les expressions
-// seul le début a té modifié afin d'initialiser l expression à tester
+// seul le début a été modifié afin d'initialiser l expression à tester
+
 
 if (!isConnect('admin')) {
   throw new Exception('{{401 - Accès non autorisé}}');
@@ -43,9 +45,9 @@ if (!isConnect('admin')) {
   <ul id="ul_expressionHistory"></ul>
 </div>
 
-
 <?php
 $expression = init('expression');
+$expression = str_replace('"', '\"', $expression);
 sendVarToJs('expression', $expression);
 ?>
 
@@ -179,3 +181,4 @@ sendVarToJs('expression', $expression);
     domUtils.ajax(paramsAJAX)
   }
 </script>
+
