@@ -4,11 +4,23 @@
 >
 >S'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
 
-**Version 2025-08-04**
+**BETA**
 
-Ne pas charger cette version: la demande de mise à jour est due à une erreur lors de la mise à jour du code dans Github (mise à jour de master au lieu de beta)
-
-
+*   Refonte de la documentation. Réorientation de la documentation et du changelog Béta vers la branche beta de Github.
+*   Refonte du code afin d'améliorer la compréhension et de faciliter la maintenance et les évolutions ultérieures
+*   Développement sous Debian 12: 
+*       pas de problème rencontré avec le lancement des actions
+*       le message d'erreur mod_insert ... n'apparait plus (pour info, il apparaissait également de manière aléatoire en Debian 11)
+*	Version minimale de Jeedom 4.4
+*   Ajout de la commande Refresh (créée lors de la sauvegarde de l'équipement). On peut lancer un Refresh en cliquant sur l'icone en haut à droite de la tuile.
+*   Ajout dans la configuration du plugin et au niveau de chaque équipement d'un paramètre indiquant si le contrôle est OK lorsque le résultat global est à true ou à false. Cela permet d'indiquer la crosse verte si le résultat des contrôles est False
+*   Reporting des watchdogs dans un virtuel
+*   Possibilité de spécifier le widget à utiliser pour les conditions et le résultat global
+*   Gestion de l'historique pour les conditions et le résultat global
+*   Gestion de macro permettant de répéter la même condition en faisant varier les paramètres, équipement en particulier
+*   Ajout de variables pour les équipements pour utilisation dans les conditions et actions
+*   Dans les actions, possibilité de récupérer l'équipement ou la commande à l'origine du lancement de l'action (dans le mode Actions sur chaque contrôle)
+*   Ajout des actions après, possibilité d'appliquer les actions Avant/Après sur chaque controle
 
 **Version 2025-06-10**
 
@@ -16,10 +28,10 @@ Ne pas charger cette version: la demande de mise à jour est due à une erreur l
 *   Application du PR de TommyChausson concernant la suppression des php notices récurrents "only variables should be passed by reference"
 *   Application du PR de TomsnCo concernant la gestion de l'arborescence
 *   Transfert de la documentation et du changelog du site de @sigalou vers github
-*   Modification de info.json pour refléter les changements de propriétaire et lkes liens de la documentation
+*   Modification de info.json pour refléter les changements de propriétaire et les liens de la documentation
 *   Blocage de la suppression du champ 'Resultat Global' qui se produisait lors de la sauvegarde
 *   Suppression du répertoire core/template qui ne sert à rien
-*   Rename de la procédure toHTML dans watchdog.class.php car elle provoque l'affichage de #cmd# dans au lieu de 'Resultat global'
+*   Rename de la procédure toHTML dans watchdog.class.php car elle provoque l'affichage de #cmd# dans les tuiles au lieu de 'Resultat global'
 
 **Version 2021-03-20 01:09:51**
 
