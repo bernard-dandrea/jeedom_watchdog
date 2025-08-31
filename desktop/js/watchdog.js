@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
-var chaineExpressionTest = "";
+
 
 $("#table_controles").sortable({ axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true });
 $("#table_actions").sortable({ axis: "y", cursor: "move", items: ".watchdogAction", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true });
@@ -21,6 +21,40 @@ $("#table_actions").sortable({ axis: "y", cursor: "move", items: ".watchdogActio
 $(document).ready(function () { //lancé quand toute la page est chargée
 	$(".bt_masqueCalculs").hide();
 });
+
+// bt_reporting_maintenance
+$('#bt_reporting_maintenance').off('click').on('click', function () {
+	jeedom.eqLogic.getSelectModal({ eqLogic: { eqType_name: 'virtual' } }, function (result) {
+
+		$.ajax({
+			type: "POST",
+			url: "plugins/watchdog/core/ajax/watchdog.ajax.php",
+			data:
+			{
+				action: "reporting_maintenance",
+				id: result.id
+			},
+			dataType: 'json',
+			error: function (request, status, error) {
+			},
+			success: function (data) {
+			}
+		});
+	});
+});
+
+// Affiche/Cache l'aide
+$('.bt_help').off('click').on('click', function () {
+	const help_fields = document.querySelectorAll('.help_field');
+	help_fields.forEach(myField => {
+		if (myField.style.display === 'none') {
+			myField.style.display = 'block'; // Affiche le champ
+		} else {
+			myField.style.display = 'none'; // Cache le champ
+		}
+	});
+});
+
 
 // BOUTONS -------------
 // Selection du virtuel utilise pour le reporting pour l'equipement
@@ -76,8 +110,16 @@ $('#bt_cronGenerator').off('click').on('click', function () {
 });
 
 $('.bt_plugin_view_log').off('click').on('click', function () {
-	$('#md_modal').dialog({ title: "{{Log de }}" + $('.eqLogicAttr[data-l1key=name]').value() });
-	$("#md_modal").load('index.php?v=d&modal=log.display&log=watchdog_' + $('.eqLogicAttr[data-l1key=id]').value()).dialog('open');
+
+	var logfile = 'watchdog';
+	if ($('.eqLogicAttr[data-l1key=configuration][data-l2key=logspecifique]').value() == '1') {
+		logfile = logfile + '_' + $('.eqLogicAttr[data-l1key=id]').value();
+	}
+	jeeDialog.dialog({
+		id: 'jee_modal2',
+		title: "{{Log de }}" + $('.eqLogicAttr[data-l1key=name]').value() + " (" + logfile + ")",
+		contentUrl: 'index.php?v=d&modal=log.display&log=' + logfile
+	})
 
 });
 
@@ -92,9 +134,16 @@ $('.bt_addControle').off('click').on('click', function () {
 function addCmdToTable(_cmd, type) {
 
 	//On ignore resultatglobal et refresh
-	if ((init(_cmd.logicalId) == 'resultatglobal')) return;
 	if ((init(_cmd.logicalId) == 'refresh')) return;
+	//On ignore resultatglobal si on n'est pas sur une condition ET/OU
+	if ($('.eqLogicAttr[data-l1key=configuration][data-l2key=typeControl]').value() == '') {
+		if ((init(_cmd.logicalId) == 'resultatglobal')) return;
+	}
 
+	var ResultatGlobal = false;
+	if (init(_cmd.logicalId) == 'resultatglobal') {
+		ResultatGlobal = true;
+	}
 	var typecontrole = '';
 	const selectElementByName = document.querySelector('select[name="typecontrole"]');
 	if (selectElementByName) { // Il est toujours bon de vérifier si l'élément existe
@@ -112,8 +161,9 @@ function addCmdToTable(_cmd, type) {
 	if (isset(type))
 		_cmd.type = type;
 	if (!isset(_cmd.subType))
-		_cmd.subType = "watchdog";
-
+		// dans la version initiale du plugin, le subtype était watchdog qui n est pas un subType supporté par jeedom et ne permettait pas un affichage correct
+		// changé en binary à partir de aout 2025
+		_cmd.subType = "binary";
 	// met en forme le resultat
 	var resultatOK = _cmd.configuration.resultat;
 	if (resultatOK == '1') {
@@ -141,19 +191,19 @@ function addCmdToTable(_cmd, type) {
 	var data_title = '';
 	switch (resultatOK) {
 		case 'True':
-			if (typecontrole == '') {
+			if (typecontrole == '' || ResultatGlobal == true) {
 				var couleur = 'success';
 				var icon = '<i class="far fa-thumbs-up"  style="color: #ffffff!important;"></i>';
 			}
 			break;
 		case 'False':
-			if (typecontrole == '') {
+			if (typecontrole == '' || ResultatGlobal == true) {
 				var couleur = 'warning';
 				var icon = '<i class="far fa-thumbs-down" style="color: #ffffff!important;"></i>';
 			}
 			break;
 		default:
-			var data_title = '{{Problème avec la formule: la formule doit renvoyer True (=1) ou False (=0).';
+			var data_title = '{{Problème avec la condition. Vous pouvez tester l\'expression avec le testeur d\'expression (3ème bouton à droite de l\'expression).}}';
 			var couleur = 'danger';
 			var icon = '<i class="far fa-question-circle" style="color: #ffffff!important;"></i>';
 	}
@@ -183,13 +233,13 @@ function addCmdToTable(_cmd, type) {
 	var iconAvant = '';
 	switch (resultatAvantOK) {
 		case 'True':
-			if (typecontrole == '') {
+			if (typecontrole == '' || ResultatGlobal == true) {
 				var couleurAvant = 'success';
 				var iconAvant = '<i class="far fa-thumbs-up"  style="color: #ffffff!important;"></i>';
 			}
 			break;
 		case 'False':
-			if (typecontrole == '') {
+			if (typecontrole == '' || ResultatGlobal == true) {
 				var couleurAvant = 'warning';
 				var iconAvant = '<i class="far fa-thumbs-down" style="color: #ffffff!important;"></i>';
 			}
@@ -201,26 +251,32 @@ function addCmdToTable(_cmd, type) {
 
 	var tr = '<tr class="cmd info" >';
 	tr += '<td width=30>';
-	//	tr += '<input type="checkbox" class="cmdAttr" data-l1key="configuration" data-l2key="disable"  title="{{Cocher pour désactiver la condition}}" />';
-
-	tr += '<input type="checkbox" style="" class="cmdAttr" data-l1key="configuration" data-l2key="disable"  title="{{Cocher pour désactiver la condition}}" />';
+	if (ResultatGlobal == false) {
+		tr += '<input type="checkbox" style="" class="cmdAttr" data-l1key="configuration" data-l2key="disable"  title="{{Cocher pour désactiver la condition}}" />';
+	}
 	tr += '</td>';
+
 	tr += '<td width=160>';
 	tr += '<input class="cmdAttr form-control input-sm" data-l1key="name" style="width : 140px;" placeholder="{{Nom}}">';
 	tr += '<span style="display:none;" class="type" type="' + init(_cmd.type) + '">' + jeedom.cmd.availableType() + '</span>';
-	tr += '<input class="cmdAttr form-control" type="hidden" data-l1key="subType" value="watchdog">';
+	tr += '<input class="cmdAttr form-control" type="hidden" data-l1key="subType" value="binary">';
 	tr += '</td>';
 	tr += '<td >';
 
-	tr += ' <input class="cmdAttr form-control input-sm"  data-type="' + _cmd.type + '" data-l1key="configuration" data-l2key="controle"  style="margin-bottom : 5px;width : 80%; display : inline-block;" >';
+	tr += ' <input class="cmdAttr form-control input-sm"  data-type="' + _cmd.type + '" data-l1key="configuration" data-l2key="controle" ';
+	if (ResultatGlobal == true) {
+		tr += ' disabled ';
+	}
+	tr += ' style="margin-bottom : 5px;width : 80%; display : inline-block;" >';
 	tr += ' <input class="cmdAttr form-control "  data-l1key="id"  style="display: none;" >';
-	tr += '<a class="btn btn-info btn-sm cursor listCmdInfo" data-type="' + _cmd.type + '"  style="margin-left : 5px;"><i class="fa fa-list-alt"  title="{{Assistant}}" style="color: #ffffff!important;"></i></a>';
-	tr += '<a class="btn btn-info btn-sm cursor macro" data-type="macro"  style="margin-left : 5px;"><i class="fab fa-medium-m" title="{{Convertir en macro}}" style="color: #ffffff!important;"></i></a>';
-	tr += '<a class="btn btn-info btn-sm cursor testexpression" data-type="testexpression"  style="margin-left : 5px;"><i class="fas fa-check" title="{{Tester l\'expression}}" style="color: #ffffff!important;"></i></a>';
+	if (ResultatGlobal == false) {
+		tr += '<a class="btn btn-info btn-sm cursor listCmdInfo" data-type="' + _cmd.type + '"  style="margin-left : 5px;"><i class="far fa-star"  title="{{Générer expression}}" style="color: #ffffff!important;"></i></a>';
+		tr += '<a class="btn btn-info btn-sm cursor macro" data-type="macro"  style="margin-left : 5px;"><i class="fab fa-medium-m" title="{{Convertir en macro}}" style="color: #ffffff!important;"></i></a>';
+		tr += '<a class="btn btn-info btn-sm cursor testexpression" data-type="testexpression"  style="margin-left : 5px;"><i class="fas fa-check" title="{{Tester l\'expression}}" style="color: #ffffff!important;"></i></a>';
 
-	tr += '<div hidden class="calcul"><small><i>';
-	tr += '<span style="margin-top : 9px; margin-left: 10px; " class="cmdAttr" data-l1key="configuration" data-l2key="calcul"></span></i></small></div>';
-	//	tr += '</td>';
+		tr += '<div hidden class="calcul"><small><i>';
+		tr += '<span style="margin-top : 9px; margin-left: 10px; " class="cmdAttr" data-l1key="configuration" data-l2key="calcul"></span></i></small></div>';
+	}
 
 	tr += '</td>';
 	tr += '<td width=150 align=center>'
@@ -267,9 +323,23 @@ function addCmdToTable(_cmd, type) {
 		}
 	}
 	tr += '</td>';
-	tr += '<td width=40 align=center>';
-	tr += '<span style="font-size: 1.5em;"><i class="fas fa-minus-circle pull-right cmdAction cursor"  data-action="remove" title="{{Supprimer le contrôle}}"></i></span>';
+
+	tr += '<td width=120 align=center>';
+
+	if (is_numeric(_cmd.id)) {
+		if (_cmd.isHistorized == '1') {
+			console.log(_cmd.isHistorized);
+			tr += '<a class="btn  btn-sm cursor historique" data-type="historique"  style="margin-left : 5px;"><i class="far fa-chart-bar" title="{{historique}}" style="color: #ffffff!important;"></i></a>';
+		}
+		tr += '<a class="btn  btn-sm cursor configure" data-type="configure"  style="margin-left : 5px;"><i class="fas fa-cogs" title="{{configure}}" style="color: #ffffff!important;"></i></a>';
+	}
+	if (ResultatGlobal == false) {
+		tr += '<span style="font-size: 1.75em;"><i class="fas fa-minus-circle  cmdAction cursor"  data-action="remove"  style="margin-left : 5px;" title="{{Supprimer le contrôle}}"></i></span>';
+	}
+
 	tr += '</td>';
+
+
 	tr += '</tr>';
 	//tr += '<tr class="bg-warning"><td class="bg-warning">frgthjkl</td></tr>';
 	$('#table_controles tbody').append(tr);
@@ -285,7 +355,7 @@ function addCmdToTable(_cmd, type) {
 // bouton ajout d'une action
 $('.bt_addAction').off('click').on('click', function () {
 	$('#table_actions').append('</center><legend><i class="fa fa-cogs" style="font-size : 2em;color:#a15bf7;"></i><span style="color:#a15bf7"> {{Nouvelle action}}</span></legend><center>');
-	addAction({}, "watchdogAction", "Nouvelle");
+	addAction(_eqLogic, {}, "watchdogAction", "Nouvelle");
 });
 
 
@@ -310,7 +380,7 @@ $('#div_pageContainer').off('click').on('click', '.cmdAction[data-action=testact
 	});
 });
 
-function addAction(_action, type, id_action = "") {
+function addAction(_eqLogic, _action, type, id_action = "") {
 
 	if (!isset(_action)) {
 		_action = {};
@@ -330,17 +400,24 @@ function addAction(_action, type, id_action = "") {
 			var couleur = 'info';
 	}
 
-	var input = '';
 	var div = '<div class="watchdogAction  alert-' + couleur + '">';
 	div += '<div class="form-group ">';
 	div += '<div class="col-sm-2">';
-	div += '<input type="checkbox" style="margin-top : 11px;margin-right : 5px;margin-left : 5px;" class="expressionAttr" data-l1key="options" data-l2key="disable" checked title="{{Décocher pour désactiver l\'action}}" />';
+	div += '<input type="checkbox" style="margin-top : 11px;margin-right : 5px;margin-left : 5px;" class="expressionAttr" data-l1key="options" data-l2key="enable" checked title="{{Décocher pour désactiver l\'action}}" />';
 	div += '<input type="checkbox" style="margin-top : 11px;margin-right : 5px;" class="expressionAttr" data-l1key="options" data-l2key="background" title="Cocher pour que la commande s\'exécute en parallèle des autres actions" />';
 	div += '<input type="checkbox" class="expressionAttr tooltipstered" style="margin-top : 11px;margin-right : 5px;" data-l1key="options" data-l2key="log" checked title="Cocher pour que l\'action soit enregistrée dans le fichier log \'watchdog_actions\'" />';
-	div += '<select class="expressionAttr form-control input-sm" data-l1key="actionType" style="margin-bottom: 10px;width:calc(100% - 70px);display:inline-block">';
-	div += '<option style="background: #dff0d8; color: #00000;" value="True">{{Passe à True}}</option>';
-	div += '<option style="background: #f2dede; color: #00000;" value="False">{{Passe à False}}</option>';
-	div += '<option style="background: #d9edf7; color: #00000;" value="Avant">{{Avant le contrôle}}</option>';
+	var typeControl = _eqLogic.configuration.typeControl;
+	var typeAction = _eqLogic.configuration.typeAction;
+	if (typeControl == '' && (type == 'True' || type == 'False') && (type == typeAction || typeAction == 'ALL')) {
+		div += '<input type="checkbox" style="margin-top : 11px;margin-right : 5px;margin-left : 5px;" class="expressionAttr" data-l1key="options" data-l2key="seulement_si_changement"  title="{{Exécuter l\'action sune seule fois}}" />';
+	}
+	div += '<select class="expressionAttr form-control input-sm" data-l1key="actionType" style="margin-bottom: 10px;width:calc(100% - 100px);display:inline-block">';
+	div += '<option style="background: #d9edf7; color: #00000;" value="Avant">{{Avant le(s) contrôle(s)}}</option>';
+	var msg = ((typeAction == 'True' || typeAction == 'ALL') ? 'Est égal à True' : 'Passe à True')
+	div += '<option style="background: #dff0d8; color: #00000;" value="True">' + msg + '</option>';
+	var msg = ((typeAction == 'False' || typeAction == 'ALL') ? 'est égal à False' : 'Passe à False')
+	div += '<option style="background: #dff0d8; color: #00000;" value="False">' + msg + '</option>';
+	div += '<option style="background: #d9edf7; color: #00000;" value="Apres">{{Après le(s) contrôle(s)}}</option>';
 	div += '</select>';
 	div += '</div>';
 	div += '<div class="col-sm-5" style="margin-top : 5px;">';
@@ -389,126 +466,80 @@ function saveEqLogic(_eqLogic) {
 	return _eqLogic;
 }
 
+
 // fontion appelée au chargement de l eqlogic
 function printEqLogic(_eqLogic) {
 
-
-	// On remplit la table_log
-	actionOptions = [];
-	$('#table_log').empty();
-	$('#table_log').append('<br><div class="bg-success"><legend><i class="fa fa-cogs"></i> {{Coucou titre}}</legend>');
-	if (isset(_eqLogic.configuration.watchdogLog)) {
-		$('#table_log').append('<br><div class="bg-success"><legend><i class="fa fa-cogs"></i> {{Coucou titre}}</legend>');
-	}
-
-	// on remplit la zone concernant le résultat global
 	typeControl = _eqLogic.configuration.typeControl;
-	dernierEtat = "(actuellement à " + _eqLogic.configuration.dernierEtat + ")";
 
-	var resultatOK = _eqLogic.configuration.dernierEtat;
-	// inverse l icone si l'affichage du Resultat est inversé
-	if (_eqLogic.configuration.ResultatOK_Courant == '0') {
-		if (resultatOK == 'True') {
-			resultatOK = 'False'
-		}
-		if (resultatOK == 'False') {
-			resultatOK = 'True'
-		}
-	}
-
-	switch (resultatOK) {
-		case 'True':
-			var couleur = 'success';
-			var icon = '<i class="far fa-thumbs-up"  style="color: #ffffff!important;"></i>';
-			break;
-		case 'False':
-			var couleur = 'warning';
-			var icon = '<i class="far fa-thumbs-down" style="color: #ffffff!important;"></i>';
-			break;
-		default:
-			var couleur = 'info';
-			var icon = '<i class="far fa-question-circle" style="color: #ffffff!important;"></i>';
-	}
-
-	var tr = '<br><br><legend><i class="fa loisir-weightlift" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7"> {{Résultat global des contrôles, méthode ';
-	tr += typeControl;
-	tr += '}}</legend>	<table class="table "  >';
-	tr += '<tr bgcolor=silver style="width: 100%; border-collapse: collapse; background-color: #e0e2e2;">';
-	tr += '<td style="width: 3px;">';
-	tr += '</td>';
-	tr += "<td style='background-color:#e0e2e2;'><i><small>Cette information peut être utilisée dans vos scénarios, il s'agit de l'info [Résultat Global]</small></i>";
-	tr += '</td>';
-	tr += '<td align=right style="background-color:#e0e2e2;">';
-
-	if (_eqLogic.configuration.dernierLancement.substring(0, 4) == "SAVE")
-		tr += "<i><small>Attention, ce résultat correspond à celui du dernier lancement du watchdog en mode programmé ou via la commande Refresh. Le résultat global n'est pas mis à jour par le bouton Sauver/Controler ---></small></i>";
-
-	tr += '</td>';
-
-	tr += '<td style="background-color:#e0e2e2;width: 100px;"><span class="label label-' + couleur + '" >' + icon + '</span>';
-	tr += '<span class="label label-' + couleur + '" style="font-weight: bold;">' + _eqLogic.configuration.dernierEtat + '</span>';
-
-	tr += '</td>';
-	tr += '<td style="width: 100px;">';
-	tr += '</td>';
-	tr += '</tr></table>';
-
-	$('#section_resultatGlobal').empty();
+	// ligne des titres
 	$('#table_controlesTitre').empty();
 
 	dernierLancement = "Aucun";
 	if (typeof _eqLogic.configuration.dernierLancement !== 'undefined') {
 		dernierLancement = _eqLogic.configuration.dernierLancement.replace('CRON ', '');
 		dernierLancement = dernierLancement.replace('SAVE ', '');
+		dernierLancement = dernierLancement.replace('REFRESH ', '');
 	}
 
 	avantDernierLancement = "Aucun";
 	if (typeof _eqLogic.configuration.avantDernierLancement !== 'undefined') {
 		avantDernierLancement = _eqLogic.configuration.avantDernierLancement.replace('CRON ', '');
 		avantDernierLancement = avantDernierLancement.replace('SAVE ', '');
+		avantDernierLancement = avantDernierLancement.replace('REFRESH ', '');
 	}
 
-	$titreCondition = ' <tr><th style="width: 40px;">{{Inactif}}</th><th style="width: 160px;">{{  Nom}}</th><th>{{  Contrôle}}</th><th class="text-center" style="width:150px;">Avant-dernier Résultat<br><small>' + avantDernierLancement + '</small></th><th class="text-center" style="width:150px;">Dernier Résultat<br><small>' + dernierLancement + '</small></th><th style="width:40px;"></th></tr>';
+	$titreCondition = ' <tr><th style="width: 40px;">{{Inactif}}</th><th style="width: 160px;">{{  Nom}}</th><th>{{  Contrôle}}</th><th class="text-center" style="width:200px;">Avant-dernier Résultat<br><small>' + avantDernierLancement + '</small></th><th class="text-center" style="width:200px;">Dernier Résultat<br><small>' + dernierLancement + '</small></th><th style="width:120px;"></th></tr>';
 
 	$('#table_controlesTitre').append($titreCondition);
 
 	// On remplit la table_actions
 	actionOptions = [];
+	var typeAction = _eqLogic.configuration.typeAction;
+	var LancementActionsAvantApres = _eqLogic.configuration.LancementActionsAvantApres;
 	$('#table_actions').empty();
 	if (isset(_eqLogic.configuration.watchdogAction)) {
 
-		// On va lister en premier les actions qui se déclencheront quand on passera de false à true
-		if (typeControl == "") {
-			$('#table_actions').append('<legend><i class="far fa-thumbs-up" style="font-size : 2em;color:#a15bf7;"></i><span style="color:#a15bf7"> {{Actions à exécuter quand un des contrôles passe à True}}</span></legend>');
-		}
-		else {
-			$('#section_resultatGlobal').html(tr);  // se place après la section résultat global
-			$('#table_actions').append('<legend><i class="far fa-thumbs-up" style="font-size : 2em;color:#a15bf7;"></i><span style="color:#a15bf7"> Actions à exécuter quand le résultat global passe à True ' + dernierEtat + '</span></legend>');
-		}
-		for (var i in _eqLogic.configuration.watchdogAction) {
-			if (_eqLogic.configuration.watchdogAction[i].actionType == "True") {
-				addAction(_eqLogic.configuration.watchdogAction[i], "True", i)
-			}
-		}
-
-		// puis les actions qui se déclencheront quand on passera de true à false
-		if (typeControl == "")
-			$('#table_actions').append('<legend><i class="far fa-thumbs-down" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Actions à exécuter quand un des contrôles passe à False}}</span></legend>');
-		else
-			$('#table_actions').append('<legend><i class="far fa-thumbs-down" style="font-size : 2em;color:#a15bf7;"></i><span style="color:#a15bf7"> Actions à exécuter quand le résultat global passe à False ' + dernierEtat + '</span></legend>');
-		for (var i in _eqLogic.configuration.watchdogAction) {
-			if (_eqLogic.configuration.watchdogAction[i].actionType == "False")
-				addAction(_eqLogic.configuration.watchdogAction[i], "False", i)
-		}
-
-		// puis les actions qui se déclencheront avant de lancer les controles
-		$('#table_actions').append('<legend><i class="fa fa-cogs" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Actions à exécuter AVANT de lancer le(s) contrôle(s)}}</span>'
-			+ '<sup><i style="color:#a15bf7" class="fas fa-question-circle tooltips" title="{{Ces actions ne sont lancées qu\'une seule fois quelque soit le mode de fonctionnement des contrôles.}}"></i></sup>'
+		//   actions qui se déclencheront avant de lancer les controles
+		var msg_LancementActionsAvantApres = (LancementActionsAvantApres != 'ALL' ? 'l\'ENSEMBLE des contrôles' : 'CHAQUE contrôle')
+		$('#table_actions').append('<legend><i class="fa fa-cogs" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Actions à exécuter AVANT de lancer }}' + msg_LancementActionsAvantApres + '</span>'
+			+ '<sup><i style="color:#a15bf7" class="fas fa-question-circle tooltips" title="{{Suivant la configuration du plugin, ces actions ne sont lancées qu\'une seule fois ou alors avant le lancement de chaque contrôle.}}"></i></sup>'
 			+ '</legend>');
 		for (var i in _eqLogic.configuration.watchdogAction) {
 			if (_eqLogic.configuration.watchdogAction[i].actionType == "Avant")
-				addAction(_eqLogic.configuration.watchdogAction[i], "Avant", i)
+				addAction(_eqLogic, _eqLogic.configuration.watchdogAction[i], "Avant", i)
 		}
+
+		// actions qui se déclencheront quand on passera de false à true
+		var msg1 = (typeControl != '' ? 'le résultat global' : 'le résultat du contrôle')
+
+		var msg2 = (typeAction == 'True' || (typeAction == 'ALL') ? 'est égal à True' : 'passe à True')
+		$('#table_actions').append('<legend><i class="far fa-thumbs-up" style="font-size : 2em;color:#a15bf7;"></i><span style="color:#a15bf7"> Actions à exécuter quand ' + msg1 + ' ' + msg2 + '</span></legend>');
+
+		for (var i in _eqLogic.configuration.watchdogAction) {
+			if (_eqLogic.configuration.watchdogAction[i].actionType == "True") {
+				addAction(_eqLogic, _eqLogic.configuration.watchdogAction[i], "True", i)
+			}
+		}
+		//   actions qui se déclencheront quand on passera de true à false
+		var msg2 = (typeAction == 'False' || (typeAction == 'ALL') ? 'est égal à False' : 'passe à False')
+		$('#table_actions').append('<legend><i class="far fa-thumbs-up" style="font-size : 2em;color:#a15bf7;"></i><span style="color:#a15bf7"> Actions à exécuter quand ' + msg1 + ' ' + msg2 + '</span></legend>');
+
+		for (var i in _eqLogic.configuration.watchdogAction) {
+			if (_eqLogic.configuration.watchdogAction[i].actionType == "False")
+				addAction(_eqLogic, _eqLogic.configuration.watchdogAction[i], "False", i)
+		}
+
+		//   actions qui se déclencheront après les controles
+		$('#table_actions').append('<legend><i class="fa fa-cogs" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Actions à exécuter APRES avoir lancé }}' + msg_LancementActionsAvantApres + '</span>'
+			+ '<sup><i style="color:#a15bf7" class="fas fa-question-circle tooltips" title="{{Suivant la configuration du plugin, ces actions ne sont lancées qu\'une seule fois ou alors après le lancement de chaque contrôle.}}"></i></sup>'
+			+ '</legend>');
+		for (var i in _eqLogic.configuration.watchdogAction) {
+			if (_eqLogic.configuration.watchdogAction[i].actionType == "Apres")
+				addAction(_eqLogic, _eqLogic.configuration.watchdogAction[i], "Apres", i)
+		}
+
+		// ajoutes les options des commandes
 		jeedom.cmd.displayActionsOption({
 			params: actionOptions,
 			async: false,
@@ -532,7 +563,6 @@ $("#table_actions").off('click').on('click', ".listAction,.listCmdAction,.remove
 	var type = $(this).attr('data-type');
 	var el = $(this).closest('.watchdogAction').find('.expressionAttr[data-l1key=cmd]');
 	if (type == 'listAction') {
-		console.log("listAction");
 		jeedom.getSelectActionModal({}, function (result) {
 			el.value(result.human);
 			jeedom.cmd.displayActionOption(el.value(), '', function (html) {
@@ -541,6 +571,7 @@ $("#table_actions").off('click').on('click', ".listAction,.listCmdAction,.remove
 			});
 		});
 	}
+
 
 	if (type == 'listCmdAction') {
 		jeedom.cmd.getSelectModal({ cmd: { type: 'action' } }, function (result) {
@@ -564,7 +595,7 @@ $("#table_actions").off('click').on('click', ".listAction,.listCmdAction,.remove
 // Assistant pour remplir facilement le test à faire sur un equipement
 // et lancer le test sur l'expression
 //-------------------------------------
-$("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.macro", function () {
+$("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.macro,.historique,.configure", function () {
 
 	var type = $(this).attr('data-type');
 	if (type == 'testexpression') {
@@ -599,10 +630,29 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 		jeeDialog.dialog({
 			title: "{{Testeur d'expression}}", // Titre de la modale
 			contentUrl: 'index.php?v=d&plugin=watchdog&modal=expression.test&expression=' + encodeURIComponent(expression)
-
 		});
 	}
 
+	else if (type == 'historique') {
+		var el_controle = $(this).closest('.info').find('.cmdAttr[data-l1key=configuration][data-l2key=controle]');
+		var condition = el_controle.val();
+		var el_id = $(this).closest('.info').find('.cmdAttr[data-l1key=id]');
+		var id = el_id.val();
+		jeeDialog.dialog({
+			title: "{{Historique}}", // Titre de la modale
+			contentUrl: 'index.php?v=d&modal=cmd.history&id=' + id
+		});
+	}
+	else if (type == 'configure') {
+		var el_controle = $(this).closest('.info').find('.cmdAttr[data-l1key=configuration][data-l2key=controle]');
+		var condition = el_controle.val();
+		var el_id = $(this).closest('.info').find('.cmdAttr[data-l1key=id]');
+		var id = el_id.val();
+		jeeDialog.dialog({
+			title: "{{Configure}}", // Titre de la modale
+			contentUrl: 'index.php?v=d&modal=cmd.configure&cmd_id=' + id
+		});
+	}
 	else if (type == 'macro') {
 		var el_macro = $('.eqLogicAttr[data-l1key=configuration][data-l2key=macro]');
 		var macro = el_macro.val();
@@ -638,12 +688,12 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 			console.log('equip: ' + equip);
 			if (equip.trim() != '') {
 				if (condition.includes(equip)) {
-					// crée la macro en remplacant l equipement trouvé par _arg0_
+					// crée la macro en remplacant l equipement trouvé par _arg1_
 					var regex = new RegExp(echapperRegex(equip), "gi");
-					var macro = condition.replace(regex, "_arg0_");
+					var macro = condition.replace(regex, "_arg1_");
 					regex = new RegExp(echapperRegex(equip), "gi");
-					macro = condition.replace(regex, "_arg0_");  // remplace l'équipement ex #[maison][Network1]# -> _arg0_
-					macro = macro.replace(equip.slice(0, -1), "#_arg0_"); // remplace les commandes ex #[maison][Network1][Statut]# -> #_arg0_[Statut]#
+					macro = condition.replace(regex, "_arg1_");  // remplace l'équipement ex #[maison][Network1]# -> _arg1_
+					macro = macro.replace(equip.slice(0, -1), "#_arg1_"); // remplace les commandes ex #[maison][Network1][Statut]# -> #_arg1_[Statut]#
 					el_macro.value(macro);
 
 					// remplace la condition en utilisant la macro
@@ -671,11 +721,11 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 					});
 					var commande = $("#resultatAjax").val();
 					if (condition.includes(commande)) {
-						// crée la macro en remplacant l commandeement trouvé par _arg0_
+						// crée la macro en remplacant l commandeement trouvé par _arg1_
 						var regex = new RegExp(echapperRegex(commande), "gi");
-						var macro = condition.replace(regex, "_arg0_");
+						var macro = condition.replace(regex, "_arg1_");
 						regex = new RegExp(echapperRegex(commande), "gi");
-						macro = condition.replace(regex, "_arg0_");
+						macro = condition.replace(regex, "_arg1_");
 						el_macro.value(macro);
 						// remplace la condition en utilisant la macro
 						el_controle.value('_macro_(' + commande + ')');
@@ -686,6 +736,8 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 		}
 	}
 	else {
+		var chaineExpressionTest = "";
+
 		var eldebut = $(this);
 		var expression = $(this).closest('expression');
 		var el = $(this).closest('.' + type).find('.cmdAttr[data-l1key=configuration][data-l2key=controle]');
@@ -704,14 +756,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 		message += '		<div class="panel panel-default">';
 		message += '			<div class="panel-heading">';
 		message += '				<h4 class="panel-title"><label for="r11" style="width: 100%;"><input type="radio" class="conditionAttr" data-l1key="radio" id="r11" value=2 name="choix" checked="checked" required/>';
-		message += '				Surveiller un équipement <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"></a></label></h4>';
-		message += '			</div>';
-		message += '			<div id="collapseOne" class="panel-collapse collapse in">';
-		message += '				<div class="panel-body">';
-		message += '					<p>';
-		message += '						 Par exemple : <b>[Cuisine][Détecteur de Présence]</b>';
-		message += '					</div>';
-		message += '				</p>';
+		message += '				Un équipement <a data-toggle="collapse" data-parent="#accordion" href="#collapseOne"></a></label></h4>';
 		message += '			</div>';
 		message += '		</div>';
 
@@ -719,14 +764,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 		message += '		<div class="panel panel-default">';
 		message += '			<div class="panel-heading">';
 		message += '				<h4 class=panel-title><label for="r12" style="width: 100%;"><input type="radio" class="conditionAttr" data-l1key="radio" id="r12" value=1 name="choix" required/>';
-		message += '				Surveiller la commande d\'un équipement <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"></a></label></h4>';
-		message += '			</div>';
-		message += '			<div id="collapseTwo" class="panel-collapse collapse">';
-		message += '				<div class="panel-body">';
-		message += '					<p>';
-		message += '						' + 'Par exemple : <b>[Cuisine][Détecteur de Présence][Présent]</b>';
-		message += '					</div>';
-		message += '				</p>';
+		message += '				La commande d\'un équipement <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"></a></label></h4>';
 		message += '			</div>';
 		message += '		</div>';
 
@@ -734,7 +772,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 		message += '		<div class="panel panel-default">';
 		message += '			<div class="panel-heading">';
 		message += '				<h4 class=panel-title><label for="r13" style="width: 100%;"><input type="radio" class="conditionAttr" data-l1key="radio" id="r13" value=3 name="choix" required/>';
-		message += '				Surveiller la config IP de Jeedom<a data-toggle="collapse" data-parent="#accordion" href="#collapseTree"></a></label></h4>';
+		message += '				La config IP de Jeedom<a data-toggle="collapse" data-parent="#accordion" href="#collapseTree"></a></label></h4>';
 		message += '			</div>';
 		message += '		</div>';
 
@@ -750,7 +788,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 
 		// Lancement de l'écran numéro 1/3	
 		bootbox.dialog({
-			title: "{{Que voulez-vous surveiller ?}}",
+			title: "{{Que voulez-vous tester ?}}",
 			message: message,
 			buttons: {
 				"Annuler": {
@@ -804,6 +842,10 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 								message += " Utiliser la macro sur cet équipement";
 								message += '</p>        </div>      </div>';
 
+								message += '<div class="panel panel-default">      <div class="panel-heading">        <h4 class=panel-title>            <label for="r14" style="width: 100%;">              <input type="radio" id="r14" value=5 name="choix" required />';
+								message += " Insérer le nom de cet équipement";
+								message += '</p>        </div>      </div>';
+
 								message += '<div class="form-group"> ' +
 									'             <div class="col-xs-12">' +
 									'  <input type="checkbox" checked="true" style="margin-top : 11px;margin-right : 10px;" class="conditionAttr" data-l1key="configuration" data-l2key="assistName" > Mettre <b>' + controlname + '</b> comme nom au contrôle' +
@@ -825,7 +867,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 								// Lancement de l'écran numéro 3/3	
 
 								bootbox.dialog({
-									title: "{{Quel test faire ?}}",
+									title: "{{Que voulez-vous faire ?}}",
 									message: message,
 									buttons: {
 										"Annuler": {
@@ -861,6 +903,10 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 
 												if ($('#r13').value() == '1') {  // // Equipement : macro
 													condition = '_macro_(' + condition + ")";
+												}
+
+												if ($('#r14').value() == '1') {  // insère le nom de l'équipement
+													condition = condition.trim();
 												}
 
 												// Ajout du ET / OU à la condition
@@ -929,7 +975,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 								tempo3 = $('.eqLogicAttr[data-l1key=configuration][data-l2key=tempo3]').value() + " secondes";
 								if (tempo3 == " secondes") tempo3 = 'à configurer';
 								message += '<div class="panel panel-default">      <div class="panel-heading">        <h4 class=panel-title>            <label for="r12" style="width: 100%;">              <input type="radio" id="r12" value=1 name="choix" required />';
-								message += " Tester la date de la dernière collecte";
+								message += " Tester la date de la dernière collecte de cette commande";
 								message += '<a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo"></a>            </label>        </h4>      </div>      <div id="collapseTwo" class="panel-collapse collapse">        <div class="panel-body">          <p>' +
 									'Tester si le délai depuis la dernière mise à jour de <br><b>' + result.human + '</b> est supérieur à :' +
 									'            <div class="col-xs-7">' +
@@ -944,6 +990,11 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 								message += '<div class="panel panel-default">      <div class="panel-heading">        <h4 class=panel-title>            <label for="r13" style="width: 100%;">              <input type="radio" id="r13" value=3 name="choix" required />';
 								message += " Utiliser la macro sur cette commande";
 								message += '</p>        </div>      </div>';
+
+								message += '<div class="panel panel-default">      <div class="panel-heading">        <h4 class=panel-title>            <label for="r14" style="width: 100%;">              <input type="radio" id="r14" value=4 name="choix" required />';
+								message += " Insérer le nom de cette commande";
+								message += '</p>        </div>      </div>';
+
 
 								// instructions script servent à afficher les choix ouvert/fermé, ... t Tempo quand on clique sur l'option
 								message += '<script>$("#r11").on("click", function(){  $(this).parent().find("a").trigger("click")});$("#r12").on("click", function(){  $(this).parent().find("a").trigger("click")});$("#r13").on("click", function(){  $(this).parent().find("a").trigger("click")})</script>';
@@ -969,7 +1020,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 								// Lancement de l'écran numéro 3/3	
 
 								bootbox.dialog({
-									title: "{{Quel test faire ?}}",
+									title: "{{Que voulez-vous faire ?}}",
 									message: message,
 									buttons: {
 										"Annuler": {
@@ -1011,12 +1062,16 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 													}
 
 													// On est dans le cas : Tester le délai depuis la dernière mise à jour de xxx ou aucune case
-													condition = 'age(' + condition + ") > " + choixtempo;
+													condition = '(age(' + condition + ") > " + choixtempo + ') ou age(' + condition + ') <0)';
 												}
 
 												if ($('#r13').value() == '1') {   // Commande : macro
 													// générer macro
 													condition = '_macro_(' + condition + ")";
+												}
+
+												if ($('#r14').value() == '1') {   // Insére le nom de la commande
+													condition = condition.trim();
 												}
 
 												condition += ' ' + $('.conditionAttr[data-l1key=next]').value() + ' ';
@@ -1048,16 +1103,11 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 							var currentLocationhostname = window.location.hostname;
 							el.atCaret('insert', '#internalAddr# = "' + currentLocationhostname + '"');
 						}
-
-						// Début Fermeture des parenthèses et accolades du premier bootbox.dialog
 					}
 				},
 			}
-
-
-
 		});
-	}	// Fin Fermeture des parenthèses et accolades du premier bootbox.dialog
+	}
 
 });
 
