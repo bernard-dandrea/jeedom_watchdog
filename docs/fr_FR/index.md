@@ -33,6 +33,7 @@ Exemples typiques d'utilisation :
 
 *   **Contrôler que les capteurs sont bien actifs**
 *   **S’assurer que les équipements réseau sont bien connectés au routeur**
+*   **Relancer un équipement qui ne répond plus**
 *   **Vérifier que les nuts sont toujours actifs**  
 
 Les contrôles peuvent être programmés sur le modèle de planification des crons.
@@ -43,17 +44,19 @@ Le résultat des contrôles peut être centralisé dans un équipement virtuel a
 
 Le plugin reprend une grosse partie des fonctions trouvées dans les scénarios au niveau des contrôles et des actions. Il se montre bien plus facile à mettre en oeuvre que les scénarios.
 
-Le plugin est autodocumenté: les explications sont fournies au niveau de la configuration du plugin et des watchdogs. Dans cette documentation, on ne reprend pas forcément toutes les explications fournies sur l'interface utilisateur.  
+Le plugin est autodocumenté: les explications sont fournies au niveau de la configuration du plugin et des watchdogs. Dans cette documentation, on ne reprend pas forcément toutes les explications fournies dans l'interface utilisateur.  
 
 # Installer le Plugin Watchdog
 
-Aller dans le Market, trouver le plugin watchdog et installer la version **stable**. Puis **Activer le plugin**.
+Aller dans le Market Jeedom, trouver le plugin watchdog et installer la version **stable**. Puis **Activer le plugin**.
 
 ![014](../images/014.png)
 
 Le plugin est accessible via le menu.
 
 # Configurer le plugin
+
+Dans la configuration, vous pouvez paramétrer les paramètres habituels des plugins et les valeurs par défaut qui seront utilisées par les watchdogs.
 
 ![015](../images/015.png)
 
@@ -75,6 +78,16 @@ La configuration d'un watchdog passe par 3 onglets:
 
 ## Onglet Watchdog
 
+![053](../images/053.png)
+
+En haut à droite, vous trouver les actions habituelles de de la configurations des équipements. Il y a 3 boutons supplémentaires:
+
+* un bouton pour cacher/afficher les explications fournies dans les zones en bleu
+* un bouton pour accéder à la documentation
+* un bouton pour accéder à la log du watchdog (log spécifique ou générale)
+
+Noter que le bouton de Sauvegarde lance les contrôles et permet de détecter les éventuelles erreurs.
+
 ![017](../images/017.png)
 
 On trouve les champs habituels des équipements Jeedom (nom, objet, ...)..
@@ -83,7 +96,7 @@ Il est possible de spécifier une log spécifique pour le watchdog ce qui permet
 
 La fréquence de lancement du watchdog est définie dans le paramètrage du cron et peut-être déterminée à l'aide de l'assistant.
 
-Les dates des deux derniers lancements et leur mode de lancement sont affichée.
+Les dates des deux derniers lancements et leur mode de lancement sont affichés.
 
 ![018](../images/018.png)
 
@@ -99,14 +112,16 @@ Avec les améliorations qui ont été apportées dans le paramétrage des action
 
 ![019](../images/019.png)
 
-Le mode de fonctionnement des actions détermine dans quel cas les actions sont déclenchées.
+Le mode de fonctionnement des actions détermine dans quel cas les actions sont lancées.
 
-Deux modes sont possibles:
+Quatre modes sont possibles:
 
-*   Lancer les actions uniquement si le contrôle (ou résultat global dans le mode OU/ET) change de valeur 
+*   Lancer les actions uniquement si le résultat du contrôle (ou le résultat global dans le mode OU/ET) change de valeur 
 *   Lancer les actions à chaque contrôle
+*   Lancer les actions True aussi longtemps que le résultat vaut True
+*   Lancer les actions False aussi longtemps que le résultat vaut False
 
-Dans les 2 cas, ce sont les actions correspondant au résultat du contrôle (True ou False) qui sont lancées.
+Dans les 4 cas, ce sont les actions correspondant au résultat du contrôle (True ou False) qui sont lancées. Les 3 derniers mode ne sont pas disponibles en mode OU/ET.
 
 ![045](../images/045.png)
 
@@ -166,21 +181,19 @@ Dans le cas du mode de fonctionnement OU/ET, le résultat global des tests appar
 
 ## Onglet Actions
 
-
 ![029](../images/029.png)
 
 Il existe 4 sortes d'action.
 
-*   Les actions qui sont lancées **AVANT** le contrôle 
-*   Les actions qui sont lancées quand le contrôle passe à **TRUE**
-*   Les actions qui sont lancées quand le contrôle passe à **FALSE**
-*   Les actions qui sont lancées **APRES** le contrôle 
+*   Les actions qui sont lancées **AVANT** l'ensemble des contrôles ou chaque contrôle 
+*   Les actions qui sont lancées quand le contrôle passe ou est égal à **TRUE**
+*   Les actions qui sont lancées quand le contrôle passe ou est égal à **FALSE**
+*   Les actions qui sont lancées **APRES** l'ensemble des contrôles ou chaque contrôle 
 
-Les actions AVANT et APRES ne sont lancées qu'une seule fois, quelque soit le nombre de contrôles.
+Le mode de lancement dépend du paramètrage définit dans l'onglet watchdog. Les libellés des actions disent explicitement comment les actions seront lancées.
 
-En mode Actions sur chaque contrôle indépendamment, chaque contrôle est effectué et si le contrôle a changé de valeur (ou si on a demandé de lancer les actions à chaque fois), les actions correspondant au nouvel état sont lancées. La même logique s'applique au résultat global en mode OU/ET.
+Les actions peuvent être désactivées, testées et par défaut elles sont enregistrées dans la log watchdog_actions. Noter que les actions s'exécutent en mode séquentiel (à moins que l'on ait coché la case mode parallèle), ce qui fait que l'exécution d'une action peut bloquer le déroulement de l'ensemble des watchdogs. Pour les actions True/False lancées tant que le résultat du contrôle vaut True/False, il est possible de demander à ce qu'une action ne soit effectuées qu'une seule fois (voir exemple [Relancer le routeur Zigbee si il ne répond pas](#relancer-le-routeur-zigbee-si-il-ne-répond-pas) ).
 
-Les actions peuvent être désactivées, testées et par défaut elles sont enregistrées dans la log watchdog_actions. Noter que les actions s'exécutent en mode séquentiel (à moins que l'on ait coché la case mode parallèle), ce qui fait que l'exécution d'une action peut bloquer le déroulement de l'ensemble des watchdogs.
 
 Les actions se définissent de la même façon que dans les scénarios. Il est possible d'utiliser les variables dans les commandes, en particulier pour fournir des informations concernant la raison du problème. Toutes les variables définies dans l'onglet Contrôles sont utilisables.
 
@@ -202,9 +215,13 @@ La tuile du watchdog permet de voir immédiatement l'état des équipements cont
 
 ![031](../images/031.png)
 
-La tuile du virtuel utilisé pour le reporting permet de voir immédiatement l'état des équipements des watchdogs qui lui sont ratachés. On peut choisir de voir l'état de tous les contrôles  ou seulement ceux en erreur (valeur par défaut).
+La tuile du virtuel utilisé pour le reporting permet de voir immédiatement l'état des équipements des watchdogs qui lui sont ratachés. On peut choisir de voir l'état de tous les contrôles ou seulement ceux en erreur (valeur par défaut).
 
 Dans les 2 cas, les templates sont repris des paramètres du watchdog. Si l'historique est activé, on peut le consulter en cliquant sur le contrôle.
+
+![054](../images/054.png)
+
+Noter que dans la partie gestion du plugin, on peut lancer la suppression dans le virtuel des résultats orphelins et renommer les résultats en fonction du nom des watchdogs et contrôles.
 
 # Exemples d’utilisation des Watchdogs 
 
@@ -308,8 +325,6 @@ Quand la situation est rétablie, un mail et un message sont envoyés.
 ## Contrôler que les Nuts sont vivants
 
 **CET EXEMPLE PROVIENT DE LA DOCUMENTATION INITIALE DU PLUGIN ET PEUT NE PAS ETRE EN PHASE AVEC LA VERSION ACTUELLE**
-
-![nutmini](../images/nutmini.jpg)
 
 J’utilise les Nuts pour savoir si nous sommes à la maison ou pas.
 
