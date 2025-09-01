@@ -43,17 +43,29 @@ $('#bt_reporting_maintenance').off('click').on('click', function () {
 	});
 });
 
+
 // Affiche/Cache l'aide
 $('.bt_help').off('click').on('click', function () {
+	set_help_state('toggle');
+});
+
+function set_help_state(state) {
+	var help_state = localStorage.getItem('help_state');
+	if (help_state != 'block' && help_state != 'none')
+		help_state = 'none';
+	if (state == 'toggle') {
+		if (help_state == 'none')
+			help_state = 'block'; // visible
+		else
+			help_state = 'none';  // non visible
+	}
 	const help_fields = document.querySelectorAll('.help_field');
 	help_fields.forEach(myField => {
-		if (myField.style.display === 'none') {
-			myField.style.display = 'block'; // Affiche le champ
-		} else {
-			myField.style.display = 'none'; // Cache le champ
-		}
+		myField.style.display = help_state;
 	});
-});
+	localStorage.setItem('help_state', help_state);
+
+}
 
 
 // BOUTONS -------------
@@ -352,12 +364,6 @@ function addCmdToTable(_cmd, type) {
 
 }
 
-// bouton ajout d'une action
-$('.bt_addAction').off('click').on('click', function () {
-	$('#table_actions').append('</center><legend><i class="fa fa-cogs" style="font-size : 2em;color:#a15bf7;"></i><span style="color:#a15bf7"> {{Nouvelle action}}</span></legend><center>');
-	addAction(_eqLogic, {}, "watchdogAction", "Nouvelle");
-});
-
 
 // Test d'une action
 $('#div_pageContainer').off('click').on('click', '.cmdAction[data-action=testaction]', function (event) {
@@ -380,7 +386,26 @@ $('#div_pageContainer').off('click').on('click', '.cmdAction[data-action=testact
 	});
 });
 
-function addAction(_eqLogic, _action, type, id_action = "") {
+// bouton ajout d'une action
+$('.bt_addAction').off('click').on('click', function () {
+	$('#table_actions').append('</center><legend><i class="fa fa-cogs" style="font-size : 2em;color:#a15bf7;"></i><span style="color:#a15bf7"> {{Nouvelle action}}</span></legend><center>');
+	var typeControl = '';
+	var selectElementByName = document.querySelector('select[name="typecontrole"]');
+	if (selectElementByName) {
+		typeControl = selectElementByName.value;
+	}
+	var typeAction = '';
+	var selectElementByName = document.querySelector('select[name="typeAction"]');
+	if (selectElementByName) {
+		typeAction = selectElementByName.value;
+	}
+	addAction(typeControl, typeAction, {}, "watchdogAction", "Nouvelle");
+});
+
+
+
+
+function addAction(typeControl, typeAction, _action, type, id_action = "") {
 
 	if (!isset(_action)) {
 		_action = {};
@@ -406,8 +431,6 @@ function addAction(_eqLogic, _action, type, id_action = "") {
 	div += '<input type="checkbox" style="margin-top : 11px;margin-right : 5px;margin-left : 5px;" class="expressionAttr" data-l1key="options" data-l2key="enable" checked title="{{Décocher pour désactiver l\'action}}" />';
 	div += '<input type="checkbox" style="margin-top : 11px;margin-right : 5px;" class="expressionAttr" data-l1key="options" data-l2key="background" title="Cocher pour que la commande s\'exécute en parallèle des autres actions" />';
 	div += '<input type="checkbox" class="expressionAttr tooltipstered" style="margin-top : 11px;margin-right : 5px;" data-l1key="options" data-l2key="log" checked title="Cocher pour que l\'action soit enregistrée dans le fichier log \'watchdog_actions\'" />';
-	var typeControl = _eqLogic.configuration.typeControl;
-	var typeAction = _eqLogic.configuration.typeAction;
 	if (typeControl == '' && (type == 'True' || type == 'False') && (type == typeAction || typeAction == 'ALL')) {
 		div += '<input type="checkbox" style="margin-top : 11px;margin-right : 5px;margin-left : 5px;" class="expressionAttr" data-l1key="options" data-l2key="seulement_si_changement"  title="{{Exécuter l\'action sune seule fois}}" />';
 	}
@@ -507,7 +530,7 @@ function printEqLogic(_eqLogic) {
 			+ '</legend>');
 		for (var i in _eqLogic.configuration.watchdogAction) {
 			if (_eqLogic.configuration.watchdogAction[i].actionType == "Avant")
-				addAction(_eqLogic, _eqLogic.configuration.watchdogAction[i], "Avant", i)
+				addAction(_eqLogic.configuration.typeControl, _eqLogic.configuration.typeAction, _eqLogic.configuration.watchdogAction[i], "Avant", i)
 		}
 
 		// actions qui se déclencheront quand on passera de false à true
@@ -518,7 +541,7 @@ function printEqLogic(_eqLogic) {
 
 		for (var i in _eqLogic.configuration.watchdogAction) {
 			if (_eqLogic.configuration.watchdogAction[i].actionType == "True") {
-				addAction(_eqLogic, _eqLogic.configuration.watchdogAction[i], "True", i)
+				addAction(_eqLogic.configuration.typeControl, _eqLogic.configuration.typeAction, _eqLogic.configuration.watchdogAction[i], "True", i)
 			}
 		}
 		//   actions qui se déclencheront quand on passera de true à false
@@ -527,7 +550,7 @@ function printEqLogic(_eqLogic) {
 
 		for (var i in _eqLogic.configuration.watchdogAction) {
 			if (_eqLogic.configuration.watchdogAction[i].actionType == "False")
-				addAction(_eqLogic, _eqLogic.configuration.watchdogAction[i], "False", i)
+				addAction(_eqLogic.configuration.typeControl, _eqLogic.configuration.typeAction, _eqLogic.configuration.watchdogAction[i], "False", i)
 		}
 
 		//   actions qui se déclencheront après les controles
@@ -536,7 +559,7 @@ function printEqLogic(_eqLogic) {
 			+ '</legend>');
 		for (var i in _eqLogic.configuration.watchdogAction) {
 			if (_eqLogic.configuration.watchdogAction[i].actionType == "Apres")
-				addAction(_eqLogic, _eqLogic.configuration.watchdogAction[i], "Apres", i)
+				addAction(_eqLogic.configuration.typeControl, _eqLogic.configuration.typeAction, _eqLogic.configuration.watchdogAction[i], "Apres", i)
 		}
 
 		// ajoutes les options des commandes
@@ -1110,6 +1133,49 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 	}
 
 });
+
+
+window.onload = function () {
+
+	// restore ou non les textes d aide
+	const help_state = localStorage.getItem('help_state');
+	if (help_state == 'none') {
+		set_help_state(help_state);
+	}
+	// affiche le bouton Documentation (code repris de plugin.js)
+	jeedom.plugin.get({
+		id: 'watchdog',
+		full: 1,
+		error: function (error) {
+			jeedomUtils.showAlert({
+				message: error.message,
+				level: 'danger'
+			})
+		},
+		success: function (data) {
+
+			// pas trouvé mieux pour se positionner à coté du bouton cacher aide
+			const search_fields = document.querySelectorAll('.locate_documentation');
+			var spanRightButton;
+			search_fields.forEach(myField => {
+				spanRightButton = myField;
+			});
+
+			title = '{{Accéder à la documentation du plugin}}';
+			if (isset(data.documentation_beta) && data.documentation_beta != '' && data.update.configuration.version == 'beta') {
+				button = '<a class="btn btn-primary "  style="margin-right:5px" target="_blank" href="' + data.documentation_beta + '" title="' + title + '"><i class="fas fa-book"></i> </a>'
+				spanRightButton.insertAdjacentHTML('beforeend', button)
+			}
+			else if (isset(data.documentation) && data.documentation != '') {
+				button = '<a class="btn btn-primary " style="margin-right:5px" target="_blank" href="' + data.documentation + '" title="' + title + '"><i class="fas fa-book"></i> </a>'
+				spanRightButton.insertAdjacentHTML('beforeend', button)
+			}
+		}
+	})
+};
+
+
+
 
 // Fonction pour échapper les caractères spéciaux d'une regex
 function echapperRegex(chaine) {
