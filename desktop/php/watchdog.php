@@ -57,13 +57,13 @@ $eqLogics = eqLogic::byType($plugin->getId());
 	<div class="col-xs-12 eqLogic" style="display: none;">
 
 		<div class="input-group pull-right" style="display:inline-flex">
-
-			<a class="btn btn-info bt_help" style="margin-right:5px" title="{{Afficher/Cacher l'aide}}"><i class="far fa-question-circle"></i> </a>
+			<div class="locate_documentation">
+				<a class="btn btn-info bt_help" style="margin-right:5px" title="{{Afficher/Cacher l'aide}}"><i class="far fa-question-circle"></i> </a>
+			</div>
 			<a class="btn btn-info eqLogicAction  bt_plugin_view_log" style="margin-right:5px" title="{{Logs du Watchdog}}"><i class="fa fa-file"></i> </a>
 			<a class="btn btn-default eqLogicAction " style="margin-right:5px" data-action="configure" title="{{Configuration avancée du Watchdog}}"><i class="fas fa-cogs"></i> </a>
-			<a class="btn btn-warning eqLogicAction " style="margin-right:5px" data-action="copy" title="{{Dupliquer cet équipement}}"><i class="fas fa-copy"></i> </a>
+			<a class="btn btn-warning eqLogicAction " style="margin-right:5px" data-action="copy" title="{{Dupliquer ce watchdog}}"><i class="fas fa-copy"></i> </a>
 			<a class="btn btn-danger eqLogicAction " style="margin-right:5px" data-action="remove" title="{{Supprimer le Watchdog}}"><i class="fas fa-minus-circle"></i> </a>
-			<a class="btn btn-default  " style="margin-right:5px" onclick="location.reload();" title="{{Recharger la page sans sauvegarder les modifications}}"><i class="fas fa-sync-alt"></i> </a>
 			<a class="btn btn-success eqLogicAction" style="margin-right:5px" data-action="save" title="{{Attention, lors de la sauvegarde, seuls les contrôles sont effectués. Les actions ne sont pas lancées. Les résultats précédents ne sont pas changés non plus.}}"><i class="fas fa-check-circle"></i> {{Sauver / Contrôler}}</a>
 		</div>
 
@@ -189,7 +189,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 						<div class="form-group">
 							<label class="col-sm-3 control-label">{{Lancer les actions}}</label>
 							<div class="col-sm-3">
-								<select style="width: 500px;" id="sel_object" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="typeAction">
+								<select name="typeAction" style="width: 500px;" id="sel_object" class="eqLogicAttr form-control" data-l1key="configuration" data-l2key="typeAction">
 									<option value="">{{Défaut: Uniquement si le résultat a changé de valeur}}</option>
 									<option value="ALL">{{ALL: Même si le résultat n'a pas changé de valeur}}</option>
 									<option value="True">{{True: Tant que le résultat vaut True ou si il passe à False}}</option>
@@ -206,7 +206,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							</div>
 							<br>
 						</div>
-						
+
 						<div class="form-group">
 							<label class="col-sm-3 control-label">{{Actions Avant/Après}}</label>
 							<div class="col-sm-3">
@@ -221,7 +221,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 							<div class="alert-info bg-success">
 								Cette option ne s'applique que dans le mode Actions sur chaque contrôle indépendamment<br>
 							</div>
-							
+
 						</div>
 						<legend><i class="icon kiko-check-line" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Résultat}}</span></legend>
 						<div class=" form-group">
@@ -292,7 +292,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 								</select>
 							</div>
 						</div>
-						
+
 
 						<legend><i class="icon kiko-book-open" style="font-size : 2em;color:#a15bf7;"></i> <span style="color:#a15bf7">{{Reporting}}</span></legend>
 
