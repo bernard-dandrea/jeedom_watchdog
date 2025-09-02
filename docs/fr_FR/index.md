@@ -15,14 +15,10 @@
     - [Onglet Watchdog](#onglet-watchdog-2)
     - [Onglet Contrôles](#onglet-contrôles-2)
     - [Onglet Actions](#onglet-actions-2)
-  - [Contrôler que les Nuts sont vivants](#contrôler-que-les-nuts-sont-vivants)
+  - [Contrôler qu'un équipement est actif avec la méthode ET](#contrôler-quun-équipement-est-actif-avec-la-méthode-et)
     - [Onglet Watchdog](#onglet-watchdog-3)
     - [Onglet Contrôles](#onglet-contrôles-3)
     - [Onglet Actions](#onglet-actions-3)
-  - [Contrôler que les capteurs XIAOMI sont actifs](#contrôler-que-les-capteurs-xiaomi-sont-actifs)
-    - [Onglet Watchdog](#onglet-watchdog-4)
-    - [Onglet Contrôles](#onglet-contrôles-4)
-    - [Onglet Actions](#onglet-actions-4)
 - [Avis](#avis)
 
 # Plugin Watchdog
@@ -322,110 +318,31 @@ Noter la coche sur la l'envoi de mail qui permet d'envoyer le mail seulement une
 
 Quand la situation est rétablie, un mail et un message sont envoyés.
 
-## Contrôler que les Nuts sont vivants
+## Contrôler qu'un équipement est actif avec la méthode ET
 
-**CET EXEMPLE PROVIENT DE LA DOCUMENTATION INITIALE DU PLUGIN ET PEUT NE PAS ETRE EN PHASE AVEC LA VERSION ACTUELLE**
+Le but de cet exemple est d'illustrer le mode de fonctionnement avec la méthode ET. Avec les améliorations apportées au plugin, cette méthode n'est plus recommandée.
 
-J’utilise les Nuts pour savoir si nous sommes à la maison ou pas.
-
-4 Nuts :
-
-*   1 Nut dans la boîte à gants de la voiture de Monsieur
-*   1 Nut accroché aux clés de Monsieur
-*   1 Nut dans la boîte à gants de la voiture de Madame
-*   1 Nut accroché aux clés de Madame
-
-L’idée est de vérifier que les nuts se sont manifestés dans les dernières 12h. A défaut, on peut imaginer qu’ils n’ont plus de pile.
+Ici, on va tester qu'un thermomètre communique régulièrement.
 
 ### Onglet Watchdog
 
-![watchd001og1bis](../images/001.png)
+![055](../images/055.png)
 
-Dans cette configuration, je lance le contrôle toutes les 2h.
-
-![002](../images/002.png)
-
-J’utilise ce mode de fonctionnement car je veux contrôler chaque Nut indépendamment et que le plugin Watchdog me signale lequel n’a pas répondu dans les dernières 12 heures.
+Dans cette configuration, le watchdog est lancé toutes les 5 minutes et le mode de fonctionnement est "Action sur l'ensemble des contrôle avec la méthode ET". Les actions sont lancées sur le changement d'état du résultat global.
 
 ### Onglet Contrôles
 
-Ici, 4 nuts donc 4 équipements à surveiller donc 4 contrôles.
+![056](../images/056.png)
 
-![003](../images/003.png)
+Il y a 2 conditions distinctes qui testent que la dernière communication est récente et que l'équipement est actif.
 
-Pour l’exemple, j’ai utilisé les noms simples de Nut, à vous de personnaliser.
-
-Le contrôle est **(#timestamp# – strtotime(collectdate(#\[Equipements internes\]\[Nut1\]\[Present\]#))) > #tempo1#**
-
-On peut soit recopier ce contrôle soit utiliser l’assistant en cliquant sur la petit icone verte à côté du contrôle.
-
-Ce contrôle va vérifier si la dernière fois que le Nut a donné signe de vie est inférieure à 12h soit 43200 secondes, il ne faut pas oublier de spécifier cela en tempo1 :
-
-![004](../images/004.png)
+La condition résultat global est calculée en effectuant un ET sur les 2 conditions précédentes.
 
 ### Onglet Actions
 
-J’ai choisi d’utiliser Pushover pour m’informer mais cela est adaptable par chacun.
+![057](../images/057.png)
 
-J’utilise donc les commandes suivantes :
-
-![005](../images/005.png)
-
-**Attention ! Dans l'illustration ci-dessus #name# doit être remplacé par #controlname#.**
-
-Nota, on peut utiliser le nom du contrôle dans l’action : **#controlname#** = Nom du contrôle qui a déclenché l’action, on peut aussi utilise **#title#** = nom du Watchdog
-
-## Contrôler que les capteurs XIAOMI sont actifs
-
-**CET EXEMPLE PROVIENT DE LA DOCUMENTATION INITIALE DU PLUGIN ET PEUT NE PAS ETRE EN PHASE AVEC LA VERSION ACTUELLE**
-
-J’utilise deux Gateway, des détecteurs d’ouverture, des détecteurs de présence, des détecteurs de vibration, des détecteurs d’eau, des capteurs température/hygro, des boutons…
-
-Je propose de créer un Watchdog pour les équipements Xiaomi, la seule différence entre les uns et les autres réside dans la durée de la tempo qui contrôle que l’équipement est actif.
-
-Le plugin Xiaomi à prévu la fonction « refresh » pour questionner l’équipement et rafraichir les valeurs. Il ne faut pas le lancer toutes les minutes sinon les piles ne finiront pas la semaine, mais pour ce type d’équipement (contrairement aux Nuts), il est utile de lancer un refresh avant de tester si l’équipement est actif.
-
-Je ne lance un Refresh que sur les équipements qui peuvent ne pas avoir de mise à jour tout seuls. Par exemple, les fenetres peuvent rester fermées plusieurs jours alors que les capteurs de présence bougent tout le temps. Donc les capteurs de fenêtres feront l’objet d’un refresh pas les capteurs de présence.
-
-### Onglet Watchdog
-
-![006](../images/006.png)
-
-Dans cette configuration, je lance le contrôle toutes les 4h.
-
-![002](../images/002.png)
-
-J’utilise ce mode de fonctionnement car je veux contrôler chaque Xiaomi indépendamment.
-
-### Onglet Contrôles
-
-Ici, (pour l’exemple) Deux Gateways, un capteur de fenêtre, un détecteur de présence :
-
-![007](../images/007.png)
-
-Le contrôle est **(#timestamp# – strtotime(collectdate(#\[Etage\]\[Gateway Chambre\]\[Online\]#))) > #tempo1#**
-
-On peut soit recopier ce contrôle soit utiliser l’assistant en cliquant sur la petit icone verte à côté du contrôle.
-
-Ce contrôle va vérifier si la dernière fois que l’équipement a donné signe de vie est inférieure à 10min pour les Gateway et 12h pour les autres équipements, il ne faut pas oublier de spécifier cela en tempo1 et tempo2 :
-
-![008](../images/008.png)
-
-### Onglet Actions
-
-J’ai choisi d’utiliser Pushover pour m’informer mais cela est adaptable par chacun.
-
-J’utilise donc les commandes suivantes :
-
-![009](../images/009.png)
-
-**Attention ! Dans l'illustration ci-dessus #name# doit être remplacé par #controlname#.**
-
-Nota, on peut utiliser le nom du contrôle dans l’action : **#controlname#** = Nom du contrôle qui a déclenché l’action, on peut aussi utilise **#title#** = nom du Watchdog
-
-Certains équipements qui doivent être rafraichis car leur état ne bouge pas forcement dans les 12 dernières heures (par exemple une fenetre ou un garage peut rester fermé). Pour cela, on peut lancer les commandes **Refresh** qui sont prévues pour actualiser l’état des équipements :
-
-![010](../images/010.png)
+Un mail est envoyés lorsque l'on perd la connexion.
 
 # Avis
 
