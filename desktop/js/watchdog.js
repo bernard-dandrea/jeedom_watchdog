@@ -1,4 +1,6 @@
-/* This file is part of Jeedom.
+/*  Last Modified : 2025/09/02 18:32:43
+ *
+ * This file is part of Jeedom.
  *
  * Jeedom is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Jeedom. If not, see <http://www.gnu.org/licenses/>.
  */
+
 
 
 $("#table_controles").sortable({ axis: "y", cursor: "move", items: ".cmd", placeholder: "ui-state-highlight", tolerance: "intersect", forcePlaceholderSize: true });
@@ -50,7 +53,7 @@ $('.bt_help').off('click').on('click', function () {
 });
 
 function set_help_state(action = 'toggle') {
-	
+
 	var help_state = localStorage.getItem('watchdog_help_state');
 	if (help_state == null)
 		help_state = 'block'; // visible
@@ -289,7 +292,7 @@ function addCmdToTable(_cmd, type) {
 	tr += ' style="margin-bottom : 5px;width : 80%; display : inline-block;" >';
 	tr += ' <input class="cmdAttr form-control "  data-l1key="id"  style="display: none;" >';
 	if (ResultatGlobal == false) {
-		tr += '<a class="btn btn-info btn-sm cursor listCmdInfo" data-type="' + _cmd.type + '"  style="margin-left : 5px;"><i class="far fa-star"  title="{{Générer expression}}" style="color: #ffffff!important;"></i></a>';
+		tr += '<a class="btn btn-info btn-sm cursor generer_expression" data-type="generer_expression"  style="margin-left : 5px;"><i class="far fa-star"  title="{{Générer expression}}" style="color: #ffffff!important;"></i></a>';
 		tr += '<a class="btn btn-info btn-sm cursor macro" data-type="macro"  style="margin-left : 5px;"><i class="fab fa-medium-m" title="{{Convertir en macro}}" style="color: #ffffff!important;"></i></a>';
 		tr += '<a class="btn btn-info btn-sm cursor testexpression" data-type="testexpression"  style="margin-left : 5px;"><i class="fas fa-check" title="{{Tester l\'expression}}" style="color: #ffffff!important;"></i></a>';
 
@@ -621,11 +624,12 @@ $("#table_actions").off('click').on('click', ".listAction,.listCmdAction,.remove
 
 });
 
+
 //-------------------------------------
 // Assistant pour remplir facilement le test à faire sur un equipement
 // et lancer le test sur l'expression
 //-------------------------------------
-$("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.macro,.historique,.configure", function () {
+$("#table_controles").off('click').on('click', ".generer_expression,.testexpression,.macro,.historique,.configure", function () {
 
 	var type = $(this).attr('data-type');
 	if (type == 'testexpression') {
@@ -765,13 +769,13 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 			}
 		}
 	}
-	else {
+	else if (type == 'generer_expression') {
 		var chaineExpressionTest = "";
 
 		var eldebut = $(this);
 		var expression = $(this).closest('expression');
-		var el = $(this).closest('.' + type).find('.cmdAttr[data-l1key=configuration][data-l2key=controle]');
-		var el_name = $(this).closest('.' + type).find('.cmdAttr[data-l1key=name]');
+		var el = $(this).closest('.info').find('.cmdAttr[data-l1key=configuration][data-l2key=controle]');
+		var el_name = $(this).closest('.info').find('.cmdAttr[data-l1key=name]');
 
 		tempo1 = $('.eqLogicAttr[data-l1key=configuration][data-l2key=tempo1]').value() + " secondes";
 		if (tempo1 == " secondes") tempo1 = 'à configurer';
@@ -1092,7 +1096,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 													}
 
 													// On est dans le cas : Tester le délai depuis la dernière mise à jour de xxx ou aucune case
-													condition = '(age(' + condition + ") > " + choixtempo + ') ou age(' + condition + ') <0)';
+													condition = '(age(' + condition + ") > " + choixtempo + ') ou (age(' + condition + ') < 0)';
 												}
 
 												if ($('#r13').value() == '1') {   // Commande : macro
@@ -1132,6 +1136,7 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 							//------------L'utilisateur demande a choisir le controle de l'IP --
 							var currentLocationhostname = window.location.hostname;
 							el.atCaret('insert', '#internalAddr# = "' + currentLocationhostname + '"');
+														console.log("3");
 						}
 					}
 				},
@@ -1139,50 +1144,6 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 		});
 	}
 
-});
-
-
-window.onload = function () {
-
-
-};
-
-document.addEventListener('DOMContentLoaded', (event) => {
-	// Le code à exécuter après le chargement du DOM
-
-	// restore ou non les textes d aide
-	set_help_state('reload');
-
-	// affiche le bouton Documentation (code repris de plugin.js)
-	jeedom.plugin.get({
-		id: 'watchdog',
-		full: 1,
-		error: function (error) {
-			jeedomUtils.showAlert({
-				message: error.message,
-				level: 'danger'
-			})
-		},
-		success: function (data) {
-
-			// pas trouvé mieux pour se positionner à coté du bouton cacher aide
-			const search_fields = document.querySelectorAll('.locate_documentation');
-			var spanRightButton;
-			search_fields.forEach(myField => {
-				spanRightButton = myField;
-			});
-
-			title = '{{Accéder à la documentation du plugin}}';
-			if (isset(data.documentation_beta) && data.documentation_beta != '' && data.update.configuration.version == 'beta') {
-				button = '<a class="btn btn-primary "  style="margin-right:5px" target="_blank" href="' + data.documentation_beta + '" title="' + title + '"><i class="fas fa-book"></i> </a>'
-				spanRightButton.insertAdjacentHTML('beforeend', button)
-			}
-			else if (isset(data.documentation) && data.documentation != '') {
-				button = '<a class="btn btn-primary " style="margin-right:5px" target="_blank" href="' + data.documentation + '" title="' + title + '"><i class="fas fa-book"></i> </a>'
-				spanRightButton.insertAdjacentHTML('beforeend', button)
-			}
-		}
-	})
 });
 
 
