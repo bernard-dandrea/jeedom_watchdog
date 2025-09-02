@@ -1,3 +1,6 @@
+<!--  
+  Last Modified : 2025/09/02 18:59:13
+-->
 # Changelog plugin Watchdog
 
 >**IMPORTANT**
@@ -6,16 +9,17 @@
 
 **BETA**
 
-*   Refonte de la documentation. Réorientation de la documentation et du changelog Béta vers la branche beta de Github.
-*   Refonte du code afin d'améliorer la compréhension et de faciliter la maintenance et les évolutions ultérieures
+*   Refonte complète de la documentation. Réorientation de la documentation et du changelog Béta vers la branche beta de Github. 
+*   Refonte du code afin d'améliorer la compréhension et de faciliter la maintenance et les évolutions ultérieures.
+*   Ajout au début de tous les fichiers de la date de modification afin d'identifier facilement les versions
 *   Développement sous Debian 12: 
-*       pas de problème rencontré avec le lancement des actions
-*       le message d'erreur mod_insert ... n'apparait plus (pour info, il apparaissait également de manière aléatoire en Debian 11)
+*   - pas de problème rencontré avec le lancement des actions
+*   - les messages d'erreur mod_insert ... n'apparait plus (pour info, il apparaissait également de manière aléatoire en Debian 11)
 *	Version minimale de Jeedom 4.4
 *   Ajout de la commande Refresh (créée lors de la sauvegarde de l'équipement). On peut lancer un Refresh en cliquant sur l'icone en haut à droite de la tuile.
-*   Ajout dans la configuration du plugin et au niveau de chaque équipement d'un paramètre indiquant si le contrôle est OK lorsque le résultat global est à true ou à false. Cela permet d'indiquer la crosse verte si le résultat des contrôles est False
-*   Reporting des watchdogs dans un virtuel
-*   Possibilité de spécifier le widget à utiliser pour les conditions et le résultat global
+*   Ajout dans la configuration du plugin et au niveau de chaque équipement d'un paramètre indiquant si le contrôle est OK lorsque le résultat global est à true ou à false. Cela permet de visualiser facilement les watchdogs en anomalie
+*   Reporting des watchdogs dans un ou plusieurs virtuel
+*   Possibilité de spécifier le template à utiliser pour les conditions et le résultat global
 *   Gestion de l'historique pour les conditions et le résultat global
 *   Gestion de macro permettant de répéter la même condition en faisant varier les paramètres, équipement en particulier
 *   Ajout de variables pour les équipements pour utilisation dans les conditions et actions
