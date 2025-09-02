@@ -49,24 +49,31 @@ $('.bt_help').off('click').on('click', function () {
 	set_help_state('toggle');
 });
 
-function set_help_state(state) {
-	var help_state = localStorage.getItem('help_state');
-	if (help_state != 'block' && help_state != 'none')
-		help_state = 'none';
-	if (state == 'toggle') {
-		if (help_state == 'none')
-			help_state = 'block'; // visible
+function set_help_state(action = 'toggle') {
+	
+	var help_state = localStorage.getItem('watchdog_help_state');
+	if (help_state == null)
+		help_state = 'block'; // visible
+
+	if (action == 'toggle') {
+		if (help_state == 'block')
+			help_state = 'none';
 		else
-			help_state = 'none';  // non visible
+			help_state = 'block';
 	}
+
 	const help_fields = document.querySelectorAll('.help_field');
 	help_fields.forEach(myField => {
 		myField.style.display = help_state;
 	});
-	localStorage.setItem('help_state', help_state);
+	if (help_state == 'block') {
+		localStorage.removeItem('watchdog_help_state');
+	}
+	else {
+		localStorage.setItem('watchdog_help_state', help_state);
+	}
 
 }
-
 
 // BOUTONS -------------
 // Selection du virtuel utilise pour le reporting pour l'equipement
@@ -1137,11 +1144,15 @@ $("#table_controles").off('click').on('click', ".listCmdInfo,.testexpression,.ma
 
 window.onload = function () {
 
+
+};
+
+document.addEventListener('DOMContentLoaded', (event) => {
+	// Le code à exécuter après le chargement du DOM
+
 	// restore ou non les textes d aide
-	const help_state = localStorage.getItem('help_state');
-	if (help_state == 'none') {
-		set_help_state(help_state);
-	}
+	set_help_state('reload');
+
 	// affiche le bouton Documentation (code repris de plugin.js)
 	jeedom.plugin.get({
 		id: 'watchdog',
@@ -1172,9 +1183,7 @@ window.onload = function () {
 			}
 		}
 	})
-};
-
-
+});
 
 
 // Fonction pour échapper les caractères spéciaux d'une regex
