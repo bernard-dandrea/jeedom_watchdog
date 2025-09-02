@@ -1,5 +1,5 @@
 <!--  
-  Last Modified : 2025/09/02 18:59:13
+  Last Modified : 2025/09/02 19:00:22
 -->
 # Changelog plugin Watchdog
 
@@ -13,8 +13,8 @@
 *   Refonte du code afin d'améliorer la compréhension et de faciliter la maintenance et les évolutions ultérieures.
 *   Ajout au début de tous les fichiers de la date de modification afin d'identifier facilement les versions
 *   Développement sous Debian 12: 
-*   - pas de problème rencontré avec le lancement des actions
-*   - les messages d'erreur mod_insert ... n'apparait plus (pour info, il apparaissait également de manière aléatoire en Debian 11)
+    - pas de problème rencontré avec le lancement des actions
+    - les messages d'erreur mod_insert ... n'apparaissent plus (pour info, il apparaissait également de manière aléatoire en Debian 11)
 *	Version minimale de Jeedom 4.4
 *   Ajout de la commande Refresh (créée lors de la sauvegarde de l'équipement). On peut lancer un Refresh en cliquant sur l'icone en haut à droite de la tuile.
 *   Ajout dans la configuration du plugin et au niveau de chaque équipement d'un paramètre indiquant si le contrôle est OK lorsque le résultat global est à true ou à false. Cela permet de visualiser facilement les watchdogs en anomalie
