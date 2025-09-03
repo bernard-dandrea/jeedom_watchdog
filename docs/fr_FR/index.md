@@ -1,3 +1,6 @@
+<!--  
+  Last Modified : 2025/09/02 18:44:57
+-->
 - [Plugin Watchdog](#plugin-watchdog)
 - [Installer le Plugin Watchdog](#installer-le-plugin-watchdog)
 - [Configurer le plugin](#configurer-le-plugin)
@@ -15,7 +18,7 @@
     - [Onglet Watchdog](#onglet-watchdog-2)
     - [Onglet Contrôles](#onglet-contrôles-2)
     - [Onglet Actions](#onglet-actions-2)
-  - [Contrôler qu'un équipement est actif avec la méthode ET](#contrôler-quun-équipement-est-actif-avec-la-méthode-et)
+  - [Contrôler que la sécurité du plancher chauffant ne s'est pas déclenchée](#contrôler-que-la-sécurité-du-plancher-chauffant-ne-sest-pas-déclenchée)
     - [Onglet Watchdog](#onglet-watchdog-3)
     - [Onglet Contrôles](#onglet-contrôles-3)
     - [Onglet Actions](#onglet-actions-3)
@@ -78,9 +81,9 @@ La configuration d'un watchdog passe par 3 onglets:
 
 En haut à droite, vous trouver les actions habituelles de de la configurations des équipements. Il y a 3 boutons supplémentaires:
 
+* un bouton pour accéder à la log du watchdog (log spécifique ou générale)
 * un bouton pour cacher/afficher les explications fournies dans les zones en bleu
 * un bouton pour accéder à la documentation
-* un bouton pour accéder à la log du watchdog (log spécifique ou générale)
 
 Noter que le bouton de Sauvegarde lance les contrôles et permet de détecter les éventuelles erreurs.
 
@@ -318,11 +321,13 @@ Noter la coche sur la l'envoi de mail qui permet d'envoyer le mail seulement une
 
 Quand la situation est rétablie, un mail et un message sont envoyés.
 
-## Contrôler qu'un équipement est actif avec la méthode ET
+## Contrôler que la sécurité du plancher chauffant ne s'est pas déclenchée
 
-Le but de cet exemple est d'illustrer le mode de fonctionnement avec la méthode ET. Avec les améliorations apportées au plugin, cette méthode n'est plus recommandée.
+Le plancher chauffant est protégé des surchauffes par un thermostat de sécurité coupe la circulation d'eau chaude si la température de départ devient trop élevée. En général, on ne peut se rendre compte du problème qu'à partir du moment où la baisse de température dans les pièces devient sensible, ce qui n'est pas agréable et demande pas mal de temps avant de retrouver la température demandée. 
 
-Ici, on va tester qu'un thermomètre communique régulièrement.
+Afin d'éviter de désagrément, un watchdog vérifie que la température de retour est bien inférieure à la température de départ. Dans ce cas, un mail est envoyé afin de demander la vérification de la sécurité.
+
+Cet exemple illustre le mode de fonctionnement avec la méthode ET.
 
 ### Onglet Watchdog
 
@@ -334,15 +339,19 @@ Dans cette configuration, le watchdog est lancé toutes les 5 minutes et le mode
 
 ![056](../images/056.png)
 
-Il y a 2 conditions distinctes qui testent que la dernière communication est récente et que l'équipement est actif.
+Il y a 4 conditions distinctes:
 
-La condition résultat global est calculée en effectuant un ET sur les 2 conditions précédentes.
+* les deux premières vérifient que les capteurs de températures départ et retour sont mises à jour régulièrement
+* la troisième vérifie que la pompe qui fait circuler l'eau dans le plancher est active
+* la quatrière contrôle que sur les 5 dernières minutes la température de retour est supérieure à celle de départ d'au moins 5 degrés
+
+Si l'ensemble de ces conditions est à True, le résultat global passe à True.
 
 ### Onglet Actions
 
 ![057](../images/057.png)
 
-Un mail est envoyés lorsque l'on perd la connexion.
+Un mail est envoyé lorsqu'il y a une anomalie et lors du retour à la normale.
 
 # Avis
 
