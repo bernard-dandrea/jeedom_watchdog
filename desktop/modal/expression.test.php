@@ -1,6 +1,7 @@
-// Last Modified : 2025/09/02 13:46:08
-
 <?php
+
+// Last Modified : 2025/09/04 16:02:27
+
 /* This file is part of Jeedom.
 *
 * Jeedom is free software: you can redistribute it and/or modify
@@ -58,6 +59,7 @@ sendVarToJs('expression', $expression);
     jeeFrontEnd.md_expressionTest = {
       init: function() {
         document.getElementById('in_testExpression').insertAtCursor(expression)
+        jeeFrontEnd.md_expressionTest.testExpression();
       },
 
       testExpression: function() {
