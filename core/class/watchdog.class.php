@@ -1,6 +1,6 @@
 <?php
 
-// Last Modified : 2025/09/02 11:48:08
+// Last Modified : 2025/09/04 16:40:27
 
 /* This file is part of Jeedom.
  *
@@ -33,8 +33,9 @@ class watchdog extends eqLogic
         $watchdog->setConfiguration('autorefresh', '*/5 * * * *');
     }
 
-    public function remove()
+    public function preRemove()
     {
+        
         $watchdog = $this;
 
         // supprime la config pour les logs specifiques
@@ -48,7 +49,9 @@ class watchdog extends eqLogic
                 $condition->report_cmd_delete();
             }
         }
-        return parent::remove();
+
+        return true;
+        
     }
     public function preSave()
     {
@@ -408,7 +411,7 @@ class watchdog extends eqLogic
             $_string = str_ireplace("#controlname#", $condition->getName(), $_string);
             $_string = str_ireplace("_controlname_", $condition->getName(), $_string);
             $_string = str_replace("#internalAddr#", '"' . config::byKey('internalAddr') . '"', $_string);  // généré par l'assistant sur controle IP de jeedom
-            $_string = str_replace("_internalAddr_", '"' . config::byKey('internalAddr') . '"', $_string);  
+            $_string = str_replace("_internalAddr_", '"' . config::byKey('internalAddr') . '"', $_string);
             // remplace les arguments de la macro
             for ($i = 1; $i <= 9; $i++) {
                 $arg = $condition->getConfiguration('arg' . $i, '');
@@ -904,16 +907,17 @@ class watchdogCmd extends cmd
     }
 
 
-    public function remove()
+    public function preRemove()
     {
         $condition = $this;
         $watchdog = $this->getEqLogic();
 
         // supprime les résultats dans le virtuel du reporting
-        if ($watchdog->getConfiguration("ReportingSuppressionAutomatique_Courant", '1') == '1') {
+        if ($watchdog->getConfiguration("ReportingSuppressionAutomatique_Courant", '') != '0') {
             $condition->report_cmd_delete();
         }
-        return parent::remove();
+
+        return true;
     }
 
     public function dontRemoveCmd()
@@ -1202,10 +1206,15 @@ class watchdogCmd extends cmd
             return False;
         }
 
+
         $VirtualReportName = $eqVirtualReport->getHumanName();
 
         log::add('watchdog', 'info', '----------------------------------------------------------------------------------------');
         log::add('watchdog', 'info', 'Suppresion des commandes infos orphelines dans ' . $VirtualReportName);
+        if (config::byKey('ReportingSuppressionAutomatique', 'watchdog', '1') == '0') {
+            log::add('watchdog', 'info', 'Suppresion des commandes infos orphelines dans ' . $VirtualReportName . ' non effectuée car la suppression des actions orphelines est désactivée dans la configuration du plugin');
+            return;
+        }
         foreach ($eqVirtualReport->getCmd('info') as $cmdresult) {
 
             if ($cmdresult->getConfiguration('type') != 'watchdog') continue;
