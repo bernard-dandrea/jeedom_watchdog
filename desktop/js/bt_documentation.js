@@ -1,4 +1,4 @@
-// Last Modified : 2025/09/03 14:38:17
+// Last Modified : 2025/09/04 17:37:20
 
 // affiche le bouton Documentation (code repris en partie de plugin.js)
 
@@ -8,7 +8,7 @@
 		<?php include_file('desktop', 'bt_documentation', 'js', 'plugin'); ?>
 	</div>
 
-			*/
+*/
 
 
 jeedom.plugin.get({
