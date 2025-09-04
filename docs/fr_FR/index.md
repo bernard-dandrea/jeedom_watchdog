@@ -1,5 +1,5 @@
 <!--  
-  Last Modified : 2025/09/02 18:44:57
+  Last Modified : 2025/09/04 11:40:14
 -->
 - [Plugin Watchdog](#plugin-watchdog)
 - [Installer le Plugin Watchdog](#installer-le-plugin-watchdog)
@@ -323,9 +323,9 @@ Quand la situation est rétablie, un mail et un message sont envoyés.
 
 ## Contrôler que la sécurité du plancher chauffant ne s'est pas déclenchée
 
-Le plancher chauffant est protégé des surchauffes par un thermostat de sécurité coupe la circulation d'eau chaude si la température de départ devient trop élevée. En général, on ne peut se rendre compte du problème qu'à partir du moment où la baisse de température dans les pièces devient sensible, ce qui n'est pas agréable et demande pas mal de temps avant de retrouver la température demandée. 
+Le plancher chauffant est protégé des surchauffes par un thermostat de sécurité qui coupe la circulation d'eau chaude si la température de départ devient trop élevée. En général, on se rend compte du problème à partir du moment où la baisse de température dans les pièces devient sensible, ce qui n'est pas agréable.
 
-Afin d'éviter de désagrément, un watchdog vérifie que la température de retour est bien inférieure à la température de départ. Dans ce cas, un mail est envoyé afin de demander la vérification de la sécurité.
+Afin d'éviter de désagrément, un watchdog détecte cette situation en vérifiant que la température de retour est bien inférieure à la température de départ. Dans ce cas, un mail est envoyé afin de demander la vérification de la sécurité.
 
 Cet exemple illustre le mode de fonctionnement avec la méthode ET.
 
