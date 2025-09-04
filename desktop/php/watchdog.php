@@ -1,5 +1,5 @@
 <!--  
-  Last Modified : 2025/09/02 16:52:16
+  Last Modified : 2025/09/04 16:21:03
 -->
 
 <?php
@@ -12,7 +12,7 @@ sendVarToJS('eqType', $plugin->getId());
 $eqLogics = eqLogic::byType($plugin->getId());
 
 ?>
- 
+
 
 
 <div class="row row-overflow">
@@ -62,16 +62,19 @@ $eqLogics = eqLogic::byType($plugin->getId());
 
 	<div class="col-xs-12 eqLogic" style="display: none;">
 
-		<div class="input-group pull-right" style="display:inline-flex">
+		<div id='buttons' class="input-group pull-right" style="display:inline-flex">
 
-			<a class="btn btn-info bt_plugin_view_log" style="margin-right:5px" title="{{Logs du Watchdog}}"><i class="fa fa-file"></i> </a>			
+			<a class="btn btn-info bt_plugin_view_log" style="margin-right:5px" title="{{Logs du Watchdog}}"><i class="fa fa-file"></i> </a>
 			<a class="btn btn-info bt_help" style="margin-right:5px" title="{{Afficher/Cacher l'aide}}"><i class="far fa-question-circle"></i> </a>
+			<div id="insert_documentation">
+				<?php include_file('desktop', 'bt_documentation', 'js', 'watchdog'); ?>
+			</div>
 			<a class="btn btn-default eqLogicAction " style="margin-right:5px" data-action="configure" title="{{Configuration avancée du Watchdog}}"><i class="fas fa-cogs"></i> </a>
 			<a class="btn btn-warning eqLogicAction " style="margin-right:5px" data-action="copy" title="{{Dupliquer ce watchdog}}"><i class="fas fa-copy"></i> </a>
 			<a class="btn btn-danger eqLogicAction " style="margin-right:5px" data-action="remove" title="{{Supprimer le Watchdog}}"><i class="fas fa-minus-circle"></i> </a>
 			<a class="btn btn-success eqLogicAction" style="margin-right:5px" data-action="save" title="{{Attention, lors de la sauvegarde, seuls les contrôles sont effectués. Les actions ne sont pas lancées. Les résultats précédents ne sont pas changés non plus.}}"><i class="fas fa-check-circle"></i> {{Sauver / Contrôler}}</a>
 		</div>
-		<?php include_file('desktop', 'bt_documentation', 'js', 'watchdog'); ?>
+
 		<!-- Liste des onglets -->
 		<ul class="nav nav-tabs" role="tablist">
 			<li role="presentation"><a href="#" class="eqLogicAction" aria-controls="home" role="tab" data-toggle="tab" data-action="returnToThumbnailDisplay"><i class="fa fa-arrow-circle-left"></i></a></li>
@@ -130,7 +133,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 
 						<div class="form-group">
 							<label class="col-sm-3 control-label">{{Log spécifique pour ce watchdog}}
-								<sup><i class="fas fa-question-circle tooltips" title="{{Si cette option est activée, les traces de ce watchdog seront enregistrées dans watchdog_ suivi de l'Id de l'eqLogic. Vous pouvez consulter directement la log en cliquant sur le bouton correspondant.}}"></i></sup>
+								<sup><i id='logspecifique_tooltip' class="fas fa-question-circle tooltips" ></i></sup>
 							</label></i>
 							<div class="col-sm-3">
 								<label class="checkbox-inline"><input type="checkbox" class="eqLogicAttr" data-l1key="configuration" data-l2key="logspecifique">{{Activé}}</label>
@@ -574,6 +577,7 @@ $eqLogics = eqLogic::byType($plugin->getId());
 	</div>
 
 	<?php include_file('desktop', 'watchdog', 'js', 'watchdog'); ?>
+	<?php include_file('desktop', 'generer_expression', 'js', 'watchdog'); ?>
 	<?php include_file('core', 'plugin.template', 'js'); ?>
 	<script>
 		// restore ou non les textes d aide
