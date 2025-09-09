@@ -7,6 +7,15 @@
 >
 >S'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
 
+
+La version BETA a été testée en profondeur et est opérationnelle sur le jeedom du développeur
+
+La documentation est à jour.
+
+Si des personnes sont volontaires pour tester cette version, cela permettra une validation compète avant transfert en stable
+
+Merci d'avance
+
 **BETA**
 
 *   Refonte complète de la documentation. Réorientation de la documentation et du changelog Béta vers la branche beta de Github. 
