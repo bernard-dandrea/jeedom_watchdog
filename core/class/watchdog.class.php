@@ -1,6 +1,6 @@
 <?php
 
-// Last Modified : 2025/09/04 16:40:27
+// Last Modified : 2025/09/11 16:51:35
 
 /* This file is part of Jeedom.
  *
@@ -35,7 +35,7 @@ class watchdog extends eqLogic
 
     public function preRemove()
     {
-        
+
         $watchdog = $this;
 
         // supprime la config pour les logs specifiques
@@ -51,7 +51,6 @@ class watchdog extends eqLogic
         }
 
         return true;
-        
     }
     public function preSave()
     {
@@ -350,9 +349,11 @@ class watchdog extends eqLogic
 
             if (($action['actionType'] != $_OrigineAction) || $options['enable'] != '1') continue;
             if ($condition != '') {
-                if ($watchdog->getConfiguration('typeControl') == '' &&  in_array($watchdog->getConfiguration('typeAction'), array('ALL', 'True', 'False')) && $options['seulement_si_changement'] == '1' && $resultat_a_change == '0') continue;
-
-                $watchdog->log('info', '║ │ ══> actions ' . $_OrigineAction . ' de [' . $condition->getName() . ']' . ' a changé ' . (string) $resultat_a_change . ' seulement_si_changement ' . $options['seulement_si_changement']);
+                $seulement_si_changement = '';
+                if (isset($options['seulement_si_changement'])) // on doit passer par une variable car l'option n'est pas forcément définie
+                    $seulement_si_changement = $options['seulement_si_changement'];
+                if ($watchdog->getConfiguration('typeControl') == '' &&  in_array($watchdog->getConfiguration('typeAction'), array('ALL', 'True', 'False')) && $seulement_si_changement == '1' && $resultat_a_change == '0') continue;
+                $watchdog->log('info', '║ │ ══> actions ' . $_OrigineAction . ' de [' . $condition->getName() . ']' . ' a changé ' . (string) $resultat_a_change . ' seulement_si_changement ' . $seulement_si_changement);
             }
             // On va remplacer les variables dans tous les champs du array "options"
             foreach ($options as $key => $option) {
