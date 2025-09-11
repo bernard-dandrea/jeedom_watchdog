@@ -1,5 +1,5 @@
 <!--  
-  Last Modified : 2025/09/02 19:00:22
+  Last Modified : 2025/09/11 16:13:54
 -->
 # Changelog plugin Watchdog
 
@@ -12,7 +12,7 @@ La version BETA a été testée en profondeur et est opérationnelle sur le jeed
 
 La documentation est à jour.
 
-Si des personnes sont volontaires pour tester cette version, cela permettra une validation compète avant transfert en stable
+Si des personnes sont volontaires pour tester cette version, cela permettra une validation complète avant transfert en stable
 
 Merci d'avance
 
