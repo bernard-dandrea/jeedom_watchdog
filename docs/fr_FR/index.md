@@ -1,5 +1,5 @@
 <!--  
-  Last Modified : 2025/09/04 11:40:14
+  Last Modified : 2025/09/14 15:19:03
 -->
 - [Plugin Watchdog](#plugin-watchdog)
 - [Installer le Plugin Watchdog](#installer-le-plugin-watchdog)
@@ -75,8 +75,6 @@ La configuration d'un watchdog passe par 3 onglets:
 * Contrôles: onglet où sont définis les tests à effectuer
 * Actions: onglet où sont définies les actions à mener en fonction du résultat des tests
 
-## Onglet Watchdog
-
 ![053](../images/053.png)
 
 En haut à droite, vous trouver les actions habituelles de de la configurations des équipements. Il y a 3 boutons supplémentaires:
@@ -85,7 +83,9 @@ En haut à droite, vous trouver les actions habituelles de de la configurations 
 * un bouton pour cacher/afficher les explications fournies dans les zones en bleu
 * un bouton pour accéder à la documentation
 
-Noter que le bouton de Sauvegarde lance les contrôles et permet de détecter les éventuelles erreurs.
+Noter que le bouton de Sauver / Contrôler lance les contrôles et permet de détecter les éventuelles erreurs.
+
+## Onglet Watchdog
 
 ![017](../images/017.png)
 
@@ -113,14 +113,7 @@ Avec les améliorations qui ont été apportées dans le paramétrage des action
 
 Le mode de fonctionnement des actions détermine dans quel cas les actions sont lancées.
 
-Quatre modes sont possibles:
-
-*   Lancer les actions uniquement si le résultat du contrôle (ou le résultat global dans le mode OU/ET) change de valeur 
-*   Lancer les actions à chaque contrôle
-*   Lancer les actions True aussi longtemps que le résultat vaut True
-*   Lancer les actions False aussi longtemps que le résultat vaut False
-
-Dans les 4 cas, ce sont les actions correspondant au résultat du contrôle (True ou False) qui sont lancées. Les 3 derniers mode ne sont pas disponibles en mode OU/ET.
+Quatre modes sont possibles. Dans chacun des cas, ce sont les actions correspondant au résultat du contrôle ou du résultat global (True ou False) qui sont lancées.
 
 ![045](../images/045.png)
 
@@ -154,11 +147,11 @@ Le contrôle ci-dessus a été généré avec le générateur d'expression. La c
 
 ![024](../images/024.png)
 
-En cliquant sur le bouton Macro, une macro est générée et l'expression est modifiée pour utiliser la macro. Lorsque la macro est modifiée, il faut cliquer sur Sauver / contrôler pour qu'elle soit prise en compte dans les expressions.
+En cliquant sur le bouton Macro, une macro est générée et l'expression est modifiée pour utiliser la macro. Lorsque la macro est modifiée, il faut cliquer sur Sauver / Contrôler pour qu'elle soit prise en compte dans les expressions.
 
 ![025](../images/025.png)
 
-L'utilisation de variables permet des faire varier certains paramètres sans modifier l'expression ou la macro. Lorsqu'une variable est modifiée, il faut cliquer sur Sauver / contrôler pour qu'elle soit prise en compte dans les expressions.
+L'utilisation de variables permet des faire varier certains paramètres sans modifier l'expression ou la macro. Lorsqu'une variable est modifiée, il faut cliquer sur Sauver / Contrôler pour qu'elle soit prise en compte dans les expressions.
 
 ![026](../images/026.png)
 
@@ -211,6 +204,8 @@ Le message utilise l'expression `_controlname_ n'est plus en ligne: dernière co
 ![030](../images/030.png)
 
 La tuile du watchdog permet de voir immédiatement l'état des équipements contrôlés. On peut choisir de voir l'état de tous les contrôles (valeur par défaut) ou seulement ceux en erreur.
+
+En cliquant sur le bouton en haut à droite de la tuile, on lance la commande Refresh.
 
 ![031](../images/031.png)
 
