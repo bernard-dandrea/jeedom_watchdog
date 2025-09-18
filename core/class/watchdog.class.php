@@ -1,6 +1,6 @@
 <?php
 
-// Last Modified : 2025/09/11 16:51:35
+// Last Modified : 2025/09/18 08:48:56
 
 /* This file is part of Jeedom.
  *
@@ -72,7 +72,7 @@ class watchdog extends eqLogic
         }
         if (($watchdog->getConfiguration('logspecifique', '0') == '0')  || $watchdog->getIsEnable() == 0) {
             if (config::byKey($_key) != '') { {
-                    log::add('watchdog', 'info', 'Suppression de la configuration ' . $_key . ' avec "' . print_r($loglevel, true) . '"');
+                    log::add('watchdog', 'info', 'Suppression de la configuration ' . $_key );
                     config::remove($_key);
                 }
             }
