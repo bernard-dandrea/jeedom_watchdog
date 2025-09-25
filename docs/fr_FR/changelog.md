@@ -8,15 +8,13 @@
 >S'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
 
 
-La version BETA a été testée en profondeur et est opérationnelle sur le jeedom du développeur
+La version du 25/09/2025 est l'objet de profonds changements avec une réécriture très importante du code et de la documentation.
 
-La documentation est à jour.
+Cette version a été testée en profondeur et est opérationnelle sur le jeedom du développeur depuis plusieurs semaines.
 
-Si des personnes sont volontaires pour tester cette version, cela permettra une validation complète avant transfert en stable
+L'installation ne devrait pas poser de problèmes mais si vous ne voulez pas prendre de risques, attendez quelques semaines afin que les éventuels problèmes résiduels soient détectés et corrigés.
 
-Merci d'avance
-
-**BETA**
+**Version 2025-09-25**
 
 *   Refonte complète de la documentation. Réorientation de la documentation et du changelog Béta vers la branche beta de Github. 
 *   Refonte du code afin d'améliorer la compréhension et de faciliter la maintenance et les évolutions ultérieures.
