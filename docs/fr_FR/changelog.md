@@ -68,4 +68,3 @@ Ne pas charger cette version: la demande de mise à jour est due à une erreur l
 *   Ajout de la possibilité de contrôler un équipement (pour vérifier le délai depuis la dernière communication avec lui par exemple)
 *   Ajout de la possibilité d’éxecuter une (ou des) action(s) avant de lancer un contrôle (pour faire un refresh par exemple)
 *   Divers améliorations graphiques.
-
