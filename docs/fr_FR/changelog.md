@@ -1,20 +1,16 @@
 <!--  
-  Last Modified : 2025/09/25 10:36:51
+  Last Modified : 2025/12/30 15:13:17
 -->
 # Changelog plugin Watchdog
 
->**IMPORTANT**
->
->S'il n'y a pas d'information sur la mise à jour, c'est que celle-ci concerne uniquement de la mise à jour de documentation, de traduction ou de texte.
+**Version 2026-01-01**
 
-
-La version du 25/09/2025 est l'objet de profonds changements avec une réécriture très importante du code et de la documentation.
-
-Cette version a été testée en profondeur et est opérationnelle sur le jeedom du développeur depuis plusieurs semaines.
-
-L'installation ne devrait pas poser de problèmes mais si vous ne voulez pas prendre de risques, attendez quelques semaines afin que les éventuels problèmes résiduels soient détectés et corrigés.
+* Déplacement de la documentation dans un repository github séparé afin de pouvoir mettre à jour la documentation sans générer un update du plugin
+* Pas d'autres changements
 
 **Version 2025-09-25**
+
+La version du 25/09/2025 est l'objet de profonds changements avec une réécriture très importante du code et de la documentation.
 
 *   Refonte complète de la documentation. Réorientation de la documentation et du changelog Béta vers la branche beta de Github. 
 *   Refonte du code afin d'améliorer la compréhension et de faciliter la maintenance et les évolutions ultérieures.
