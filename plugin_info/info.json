@@ -9,13 +9,14 @@
 	"hasDependency" : false,
 	"hasOwnDeamon" : false,
 	"maxDependancyInstallTime" : 0,
-	"changelog" : "https://bernard-dandrea.github.io/jeedom_watchdog/#language#/changelog",
-	"documentation" : "https://bernard-dandrea.github.io/jeedom_watchdog/#language#/",
-	"changelog_beta" : "https://github.com/bernard-dandrea/jeedom_watchdog/blob/beta/docs/fr_FR/changelog.md",
-	"documentation_beta" : "https://github.com/bernard-dandrea/jeedom_watchdog/blob/beta/docs/fr_FR/index.md",
+	"changelog" : "https://bernard-dandrea.github.io/documentation/jeedom_watchdog/doc/#language#/changelog",
+	"documentation" : "https://bernard-dandrea.github.io/documentation/jeedom_watchdog/doc/#language#/index",
+	"changelog_beta" : "https://bernard-dandrea.github.io/documentation/jeedom_watchdog/doc/#language#/changelog_beta",
+	"documentation_beta" : "https://bernard-dandrea.github.io/documentation/jeedom_watchdog/doc/#language#/index_beta",
 	"link" : {
 		"forum":"https://community.jeedom.com/tag/plugin-watchdog"
 	},
 	"language" : ["fr_FR","en_US","de_DE","sp_SP","ru_RU","id_ID","it_IT"],
 	"compatibility" : ["miniplus","smart","rpi","docker","diy","mobile","v4"]
+
 }
