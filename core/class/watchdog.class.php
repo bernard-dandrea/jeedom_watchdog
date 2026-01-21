@@ -1,6 +1,6 @@
 <?php
 
-// Last Modified : 2025/09/18 08:48:56
+// Last Modified : 2026/01/21 18:22:44
 
 /* This file is part of Jeedom.
  *
@@ -776,16 +776,6 @@ class watchdogCmd extends cmd
 
         // configure les conditions si on n'est pas en mode ET/OU
         if ($watchdog->getConfiguration('typeControl') == '') {
-
-            // Etablit l'affichage inversé en cas de SAVE afin que le controle s'affiche correctement
-            if ($condition->getDisplay("showNameOndashboard", '1') == '0') {
-                $condition->setDisplay("showNameOndashboard", '1');
-            }
-
-            if ($condition->getDisplay("showNameOnmobile", '1') == '0') {
-                $condition->setDisplay("showNameOnmobile", '1');
-            }
-
 
             $DisplayOnlyConditionNonOK = $watchdog->getConfiguration("DisplayOnlyConditionNonOK_Courant");
             // affiche le controle quelque soit le résultat
